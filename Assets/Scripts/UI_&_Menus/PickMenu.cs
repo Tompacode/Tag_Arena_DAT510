@@ -3,8 +3,6 @@ using UnityEngine;
 public class PickMenu : MonoBehaviour
 {
 
-    public int characterID;
-
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -22,10 +20,9 @@ public class PickMenu : MonoBehaviour
         Debug.Log("Viking 1 selected");  // Egen för varje character button 
     }
 
-    public void onButtonClickCharacterButton()
+    public void Viking2Clicked()
     {
-        Debug.Log("Character button clicked: " +  characterID);
-
+        Debug.Log("Viking 2 selected");  
     }
 
 
