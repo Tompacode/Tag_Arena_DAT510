@@ -16,6 +16,8 @@ public class PickMenu : MonoBehaviour
 
     int pickStep = 0;
 
+    Transform[] PickedCharacterPos;
+
     Picker[] pickOrder =
     {
     Picker.Player1,
@@ -77,11 +79,15 @@ public class PickMenu : MonoBehaviour
         // else
         //    currentPicker = Picker.Player1;
 
-        // 1 2 2 1 
 
+        // 1 2 2 1 
         if (pickStep >= pickOrder.Length - 1)
         {
-            Debug.Log("Picking complete!");
+            Debug.Log("Selection complete!");
+
+            if (menuPanelTextField != null)
+                menuPanelTextField.text = "Selection complete";
+
             return;
         }
 
