@@ -44,7 +44,6 @@ public class PickMenu : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        ResetSelection();
 
         PickedCharacterPos = new Transform[]
         {
@@ -54,6 +53,7 @@ public class PickMenu : MonoBehaviour
             Player1Pick2Pos
         };
 
+        ResetSelection();
         UpdatePickerText();
     }
 
@@ -89,6 +89,19 @@ public class PickMenu : MonoBehaviour
                 button.interactable = true;
         }
 
+        if (PickedCharacterPos != null)
+        {
+            foreach (var pos in PickedCharacterPos)
+            {
+                if (pos == null) continue;
+
+                for (int i = 0; i < pos.childCount; i++)
+                {
+                    pos.GetChild(i).gameObject.SetActive(false);
+                }
+            }
+        }
+
         UpdatePickerText();
 
         Debug.Log("Character select reset");
@@ -108,6 +121,37 @@ public class PickMenu : MonoBehaviour
         // Alt. SceneManager.LoadSceneAsync("PlayScene");
         SceneManager.LoadScene("PlayScene");
         Debug.Log("To PlayScene"); 
+    }
+
+    public void enable3DModelWhenPicked(string characterName)
+    {
+        if (PickedCharacterPos == null || pickStep >= PickedCharacterPos.Length)
+        {
+            return;
+        }
+            
+
+        Transform pickPos = PickedCharacterPos[pickStep];
+        if (pickPos == null) {
+            return;
+        }
+
+        for (int i = 0; i < pickPos.childCount; i++)
+        {
+            pickPos.GetChild(i).gameObject.SetActive(false);
+        }
+
+        for (int i = 0; i < pickPos.childCount; i++)
+        {
+            GameObject child = pickPos.GetChild(i).gameObject;
+
+            if (child.name.Contains(characterName))
+            {
+                child.SetActive(true);
+                Debug.Log("Enabled model: " + child.name);
+                break;
+            }
+        }
     }
 
     public void HandlePick()
@@ -175,6 +219,7 @@ public class PickMenu : MonoBehaviour
             Debug.Log(characterName + " stands at position: " + pos.name);
         }
 
+        enable3DModelWhenPicked(characterName);
         HandlePick();
     }
 
@@ -185,16 +230,16 @@ public class PickMenu : MonoBehaviour
 
     public void VikingMaleClicked()
     {
-        Debug.Log("Viking 1 selected");
+        Debug.Log("Viking male selected");
 
-        registerPick("Viking1", Viking1Button);
+        registerPick("VikingMale", Viking1Button);
     }
 
     public void VikingFemaleClicked()
     {
-        Debug.Log("Viking 2 selected");
+        Debug.Log("Viking female selected");
 
-        registerPick("Viking2", Viking2Button);
+        registerPick("VikingFemale", Viking2Button);
     }
 
     public void GladiatorClicked()
