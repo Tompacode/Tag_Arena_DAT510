@@ -2,11 +2,13 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections.Generic;
 using TMPro;
+using UnityEngine.UI; 
 
 public class PickMenu : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI menuPanelTextField;
-    const int MAX_TEAM = 2;
+
+    const int MaxPerTeam = 2;
 
     enum Picker
     {
@@ -16,7 +18,14 @@ public class PickMenu : MonoBehaviour
 
     int pickStep = 0;
 
+    public Transform Player1Pick1Pos;
+    public Transform Player1Pick2Pos;
+    public Transform Player2Pick1Pos;
+    public Transform Player2Pick2Pos;
+
     Transform[] PickedCharacterPos;
+
+    public Button[] characterButtons;
 
     Picker[] pickOrder =
     {
@@ -29,11 +38,22 @@ public class PickMenu : MonoBehaviour
     Picker currentPicker = Picker.Player1;
 
     List<string> player1Team = new List<string>();
+
     List<string> player2Team = new List<string>();
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        ResetSelection();
+
+        PickedCharacterPos = new Transform[]
+        {
+            Player1Pick1Pos,
+            Player2Pick1Pos,
+            Player2Pick2Pos,
+            Player1Pick2Pos
+        };
+
         UpdatePickerText();
     }
 
@@ -55,6 +75,24 @@ public class PickMenu : MonoBehaviour
             }
         }
     }
+    void ResetSelection()
+    {
+        pickStep = 0;
+        currentPicker = Picker.Player1;
+
+        player1Team.Clear();
+        player2Team.Clear();
+
+        foreach (var button in characterButtons)
+        {
+            if (button != null)
+                button.interactable = true;
+        }
+
+        UpdatePickerText();
+
+        Debug.Log("Character select reset");
+    }
 
     public void GoToMainMenu()
     {
@@ -62,6 +100,7 @@ public class PickMenu : MonoBehaviour
         // Alt. SceneManager.LoadSceneAsync("GameScene"); för load in background 
 
         Debug.Log("Back to main menu");
+
     }
 
     public void finishedSelectionPlay()
@@ -97,18 +136,79 @@ public class PickMenu : MonoBehaviour
         UpdatePickerText();
     }
 
-    public void Viking1Clicked()
+    void registerPick(string characterName, Button clickedButton)
     {
-        Debug.Log("Viking 1 selected");
+        if (pickStep >= pickOrder.Length){
+            Debug.Log("Selection already complete");
+            return;
+        }
+
+        if (currentPicker == Picker.Player1)
+        {
+            if (player1Team.Count >= MaxPerTeam)
+            {
+                return;
+            }
+
+            player1Team.Add(characterName);
+            Debug.Log("Player 1 selected: " + characterName);
+        }
+        else
+        {
+            if (player2Team.Count >= MaxPerTeam)
+            {
+                return;
+            }
+
+            player2Team.Add(characterName);
+            Debug.Log("Player 2 selected: " + characterName);
+        }
+
+        if (clickedButton != null)
+        {
+            clickedButton.interactable = false;
+        }
+
+        if (pickStep < PickedCharacterPos.Length && PickedCharacterPos[pickStep] != null)
+        {
+            Transform pos = PickedCharacterPos[pickStep];
+            Debug.Log(characterName + " stands at position: " + pos.name);
+        }
 
         HandlePick();
     }
 
-    public void Viking2Clicked()
+    [SerializeField] Button Viking1Button;
+    [SerializeField] Button Viking2Button;
+    [SerializeField] Button GladiatorButton;
+    [SerializeField] Button SamuraiButton;
+
+    public void VikingMaleClicked()
+    {
+        Debug.Log("Viking 1 selected");
+
+        registerPick("Viking1", Viking1Button);
+    }
+
+    public void VikingFemaleClicked()
     {
         Debug.Log("Viking 2 selected");
 
-        HandlePick();
+        registerPick("Viking2", Viking2Button);
+    }
+
+    public void GladiatorClicked()
+    {
+        Debug.Log("Gladiator selected");
+
+        registerPick("Gladiator", GladiatorButton);
+    }
+
+    public void SamuraiClicked()
+    {
+        Debug.Log("Samurai selected");
+
+        registerPick("Samurai", SamuraiButton);
     }
 
 

@@ -1981,6 +1981,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   menuPanelTextField: {fileID: 1061619238}
+  Player1Pick1Pos: {fileID: 250090657}
+  Player1Pick2Pos: {fileID: 1741752638}
+  Player2Pick1Pos: {fileID: 1438552646}
+  Player2Pick2Pos: {fileID: 765858212}
+  characterButtons:
+  - {fileID: 1423293081}
+  - {fileID: 2056194125}
+  - {fileID: 911889127}
+  - {fileID: 1512864450}
+  Viking1Button: {fileID: 1423293081}
+  Viking2Button: {fileID: 2056194125}
+  GladiatorButton: {fileID: 1512864450}
+  SamuraiButton: {fileID: 911889127}
 --- !u!4 &850315751
 Transform:
   m_ObjectHideFlags: 0
@@ -2226,7 +2239,7 @@ GameObject:
   - component: {fileID: 911889128}
   - component: {fileID: 911889127}
   m_Layer: 5
-  m_Name: CharacterButton3
+  m_Name: CharacterButton3-samurai
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2294,7 +2307,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 911889128}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 850315750}
+        m_TargetAssemblyTypeName: PickMenu, Assembly-CSharp
+        m_MethodName: SamuraiClicked
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &911889128
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2315,8 +2340,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
-  m_Type: 1
+  m_Sprite: {fileID: 21300000, guid: d208bb5ab24d220459e7a61217d7c8aa, type: 3}
+  m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -2652,6 +2677,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   menuPanelTextField: {fileID: 0}
+  Player1Pick1Pos: {fileID: 0}
+  Player1Pick2Pos: {fileID: 0}
+  Player2Pick1Pos: {fileID: 0}
+  Player2Pick2Pos: {fileID: 0}
+  characterButtons: []
+  Viking1Button: {fileID: 0}
+  Viking2Button: {fileID: 0}
+  GladiatorButton: {fileID: 0}
+  SamuraiButton: {fileID: 0}
 --- !u!224 &996320316
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4258,7 +4292,7 @@ GameObject:
   - component: {fileID: 1423293082}
   - component: {fileID: 1423293081}
   m_Layer: 5
-  m_Name: CharacterButton1
+  m_Name: CharacterButton1-maleViking
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4329,7 +4363,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 850315750}
         m_TargetAssemblyTypeName: PickMenu, Assembly-CSharp
-        m_MethodName: Viking1Clicked
+        m_MethodName: VikingMaleClicked
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -4406,7 +4440,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1993459253}
   - {fileID: 263794143}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -4508,7 +4541,7 @@ GameObject:
   - component: {fileID: 1512864451}
   - component: {fileID: 1512864450}
   m_Layer: 5
-  m_Name: CharacterButton4
+  m_Name: CharacterButton4-gladiator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4576,7 +4609,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1512864451}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 850315750}
+        m_TargetAssemblyTypeName: PickMenu, Assembly-CSharp
+        m_MethodName: GladiatorClicked
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1512864451
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4597,8 +4642,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
-  m_Type: 1
+  m_Sprite: {fileID: 21300000, guid: b365e11adb58ee64fba12a53b7e0d1a2, type: 3}
+  m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -5643,77 +5688,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8b499951a29658b4cb6bfdb4cb51be98, type: 3}
---- !u!1001 &1993459252
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 1438552646}
-    m_Modifications:
-    - target: {fileID: 112030, guid: 4794571d75bb57947a3f110fddd024e4, type: 3}
-      propertyPath: m_Name
-      value: Character_Warrior_02_White
-      objectReference: {fileID: 0}
-    - target: {fileID: 112030, guid: 4794571d75bb57947a3f110fddd024e4, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 413296, guid: 4794571d75bb57947a3f110fddd024e4, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 2.2
-      objectReference: {fileID: 0}
-    - target: {fileID: 413296, guid: 4794571d75bb57947a3f110fddd024e4, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: -1.9558839
-      objectReference: {fileID: 0}
-    - target: {fileID: 413296, guid: 4794571d75bb57947a3f110fddd024e4, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 1.91
-      objectReference: {fileID: 0}
-    - target: {fileID: 413296, guid: 4794571d75bb57947a3f110fddd024e4, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: -0.38992754
-      objectReference: {fileID: 0}
-    - target: {fileID: 413296, guid: 4794571d75bb57947a3f110fddd024e4, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 413296, guid: 4794571d75bb57947a3f110fddd024e4, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0.92084557
-      objectReference: {fileID: 0}
-    - target: {fileID: 413296, guid: 4794571d75bb57947a3f110fddd024e4, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 413296, guid: 4794571d75bb57947a3f110fddd024e4, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 413296, guid: 4794571d75bb57947a3f110fddd024e4, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 225.9
-      objectReference: {fileID: 0}
-    - target: {fileID: 413296, guid: 4794571d75bb57947a3f110fddd024e4, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects:
-    - {fileID: 118028, guid: 4794571d75bb57947a3f110fddd024e4, type: 3}
-    - {fileID: 149658, guid: 4794571d75bb57947a3f110fddd024e4, type: 3}
-    - {fileID: 180298, guid: 4794571d75bb57947a3f110fddd024e4, type: 3}
-    - {fileID: 146814, guid: 4794571d75bb57947a3f110fddd024e4, type: 3}
-    - {fileID: 119950, guid: 4794571d75bb57947a3f110fddd024e4, type: 3}
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 4794571d75bb57947a3f110fddd024e4, type: 3}
---- !u!4 &1993459253 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 413296, guid: 4794571d75bb57947a3f110fddd024e4, type: 3}
-  m_PrefabInstance: {fileID: 1993459252}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2018634097
 GameObject:
   m_ObjectHideFlags: 0
@@ -5939,7 +5913,7 @@ GameObject:
   - component: {fileID: 2056194126}
   - component: {fileID: 2056194125}
   m_Layer: 5
-  m_Name: CharacterButton2
+  m_Name: CharacterButton2-femaleViking
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6010,7 +5984,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 850315750}
         m_TargetAssemblyTypeName: PickMenu, Assembly-CSharp
-        m_MethodName: Viking2Clicked
+        m_MethodName: VikingFemaleClicked
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
