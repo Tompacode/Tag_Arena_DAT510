@@ -130,7 +130,6 @@ public class PickMenu : MonoBehaviour
             return;
         }
             
-
         Transform pickPos = PickedCharacterPos[pickStep];
         if (pickPos == null) {
             return;
@@ -138,12 +137,8 @@ public class PickMenu : MonoBehaviour
 
         for (int i = 0; i < pickPos.childCount; i++)
         {
-            pickPos.GetChild(i).gameObject.SetActive(false);
-        }
-
-        for (int i = 0; i < pickPos.childCount; i++)
-        {
             GameObject child = pickPos.GetChild(i).gameObject;
+            child.SetActive(false);
 
             if (child.name.Contains(characterName))
             {
@@ -151,6 +146,7 @@ public class PickMenu : MonoBehaviour
                 Debug.Log("Enabled model: " + child.name);
                 break;
             }
+
         }
     }
 
