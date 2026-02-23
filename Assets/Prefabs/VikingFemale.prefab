@@ -1226,7 +1226,7 @@ GameObject:
   - component: {fileID: 8663281497264622175}
   - component: {fileID: 702987532221297776}
   m_Layer: 0
-  m_Name: Viking_Woman
+  m_Name: VikingFemale
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

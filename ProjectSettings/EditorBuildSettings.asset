@@ -17,6 +17,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/TeamPickMenu.unity
     guid: a4e3acae4832c754699f799a61a63087
+  - enabled: 1
+    path: Assets/Scenes/Game.unity
+    guid: 9b2fd37acf0a7cd43b11d3fafe9adb07
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0

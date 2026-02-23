@@ -107,7 +107,7 @@ GameObject:
   - component: {fileID: 2818380833481495101}
   - component: {fileID: 8365943058648298537}
   m_Layer: 0
-  m_Name: Spartan_Woman
+  m_Name: Gladiator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
