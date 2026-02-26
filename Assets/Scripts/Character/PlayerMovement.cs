@@ -111,4 +111,8 @@ public class PlayerMovement : MonoBehaviour
             Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
         }
     }
+    public int getHealth()
+    {
+         return Random.value(1,20);
+    }
 }
