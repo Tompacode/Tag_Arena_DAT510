@@ -9,7 +9,7 @@ public class PickMenu : MonoBehaviour
     [SerializeField] private TextMeshProUGUI menuPanelTextField;
 
     const int MaxPerTeam = 2;
-
+    public GameManager gm;
     enum Picker
     {
         Player1,
@@ -44,6 +44,11 @@ public class PickMenu : MonoBehaviour
     List<string> player2Team = new List<string>();
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
+
+    private void Awake()
+    {
+        gm = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>();
+    }
     void Start()
     {
         PlayButton.enabled = false;

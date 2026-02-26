@@ -113,6 +113,6 @@ public class PlayerMovement : MonoBehaviour
     }
     public int getHealth()
     {
-         return Random.value(1,20);
+        return Random.Range(1, 20);
     }
 }
