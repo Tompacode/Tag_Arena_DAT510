@@ -124,16 +124,13 @@ public class PickMenu : MonoBehaviour
 
     public void GoToMainMenu()
     {
-        SceneManager.LoadScene("MainMenu"); // Borde fortfarande funka för snabba scener?
-        // Alt. SceneManager.LoadSceneAsync("GameScene"); för load in background 
-
+        SceneManager.LoadScene("MainMenu"); 
         Debug.Log("Back to main menu");
 
     }
 
     public void finishedSelectionPlay()
     {
-        // Alt. SceneManager.LoadSceneAsync("PlayScene");
         SceneManager.LoadScene("Game");
         Debug.Log("To Game Scene"); 
     }
