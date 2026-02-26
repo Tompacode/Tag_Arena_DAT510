@@ -9,7 +9,7 @@ public class PickMenu : MonoBehaviour
     [SerializeField] private TextMeshProUGUI menuPanelTextField;
 
     const int MaxPerTeam = 2;
-
+    public GameManager gm;
     enum Picker
     {
         Player1,
@@ -27,6 +27,8 @@ public class PickMenu : MonoBehaviour
 
     public Button[] characterButtons;
 
+    public Button PlayButton;
+
     Picker[] pickOrder =
     {
     Picker.Player1,
@@ -42,9 +44,14 @@ public class PickMenu : MonoBehaviour
     List<string> player2Team = new List<string>();
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
+
+    private void Awake()
+    {
+        gm = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>();
+    }
     void Start()
     {
-
+        PlayButton.enabled = false;
         PickedCharacterPos = new Transform[]
         {
             Player1Pick1Pos,
@@ -60,6 +67,14 @@ public class PickMenu : MonoBehaviour
     // Update is called once per frame
     // void Update()
     // {}
+
+    private void Update()
+    {
+        if(pickStep == 3)
+        {
+           PlayButton.enabled = true;
+        }
+    }
 
     void UpdatePickerText()
     {
@@ -109,18 +124,15 @@ public class PickMenu : MonoBehaviour
 
     public void GoToMainMenu()
     {
-        SceneManager.LoadScene("MainMenu"); // Borde fortfarande funka för snabba scener?
-        // Alt. SceneManager.LoadSceneAsync("GameScene"); för load in background 
-
+        SceneManager.LoadScene("MainMenu"); 
         Debug.Log("Back to main menu");
 
     }
 
     public void finishedSelectionPlay()
     {
-        // Alt. SceneManager.LoadSceneAsync("PlayScene");
-        SceneManager.LoadScene("PlayScene");
-        Debug.Log("To PlayScene"); 
+        SceneManager.LoadScene("Game");
+        Debug.Log("To Game Scene"); 
     }
 
     public void enable3DModelWhenPicked(string characterName)
