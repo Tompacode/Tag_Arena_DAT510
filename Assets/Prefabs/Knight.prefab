@@ -1783,7 +1783,7 @@ GameObject:
   - component: {fileID: 5626159935983808131}
   - component: {fileID: 1488095395766763150}
   m_Layer: 0
-  m_Name: VikingMale
+  m_Name: Knight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

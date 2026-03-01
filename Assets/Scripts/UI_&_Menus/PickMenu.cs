@@ -1,7 +1,8 @@
-using UnityEngine;
-using UnityEngine.SceneManagement;
+using System;
 using System.Collections.Generic;
 using TMPro;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI; 
 
 public class PickMenu : MonoBehaviour
@@ -16,7 +17,10 @@ public class PickMenu : MonoBehaviour
         Player2
     }
 
+    // Counters 
     int pickStep = 0;
+    int player1TeamIndex = 0;
+    int player2TeamIndex = 0;
 
     public Transform Player1Pick1Pos;
     public Transform Player1Pick2Pos;
@@ -47,8 +51,15 @@ public class PickMenu : MonoBehaviour
 
     private void Awake()
     {
-        gm = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>();
+
+        gm = GameManager.Instance;
+
+        if (gm == null)
+            Debug.LogError("No GameManager.Instance found.");
+
+        //gm = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>();
     }
+
     void Start()
     {
         PlayButton.enabled = false;
@@ -97,6 +108,12 @@ public class PickMenu : MonoBehaviour
 
         player1Team.Clear();
         player2Team.Clear();
+
+        player1TeamIndex = 0;
+        player2TeamIndex = 0;
+
+        if (gm != null)
+            gm.ClearTeams();
 
         foreach (var button in characterButtons)
         {
@@ -203,6 +220,13 @@ public class PickMenu : MonoBehaviour
             }
 
             player1Team.Add(characterName);
+
+            if (player1TeamIndex < gm.player1Team.Length)
+            {
+                gm.player1Team[player1TeamIndex] = characterName;
+                player1TeamIndex++;
+            }
+
             Debug.Log("Player 1 selected: " + characterName);
         }
         else
@@ -213,6 +237,13 @@ public class PickMenu : MonoBehaviour
             }
 
             player2Team.Add(characterName);
+
+            if (player2TeamIndex < gm.player2Team.Length)
+            {
+                gm.player2Team[player2TeamIndex] = characterName;
+                player2TeamIndex++;
+            }
+
             Debug.Log("Player 2 selected: " + characterName);
         }
 
@@ -231,23 +262,23 @@ public class PickMenu : MonoBehaviour
         HandlePick();
     }
 
-    [SerializeField] Button Viking1Button;
-    [SerializeField] Button Viking2Button;
+    [SerializeField] Button KnightButton;
+    [SerializeField] Button VikingFemaleButton;
     [SerializeField] Button GladiatorButton;
     [SerializeField] Button SamuraiButton;
 
-    public void VikingMaleClicked()
+    public void KnightClicked()
     {
-        Debug.Log("Viking male selected");
+        Debug.Log("Knight selected");
 
-        registerPick("VikingMale", Viking1Button);
+        registerPick("Knight", KnightButton);
     }
 
     public void VikingFemaleClicked()
     {
         Debug.Log("Viking female selected");
 
-        registerPick("VikingFemale", Viking2Button);
+        registerPick("VikingFemale", VikingFemaleButton);
     }
 
     public void GladiatorClicked()
