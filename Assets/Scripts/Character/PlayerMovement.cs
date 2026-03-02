@@ -1,10 +1,20 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    [Header("Movement Settings")]
+    public string PlayerID;
+
+    [Header("Stats")]
+    [SerializeField]
+    private int health = 100;
+    [SerializeField]
+    private int stamina = 100;
     [SerializeField]
     private float speed = 5f;
+
+    [Header("Movement Settings")]
+    
     [SerializeField]
     private float jumpForce = 5f;
     
@@ -21,7 +31,10 @@ public class PlayerMovement : MonoBehaviour
     private bool isGrounded;
     private float horizontalInput;
     private bool isFacingRight = true;
-    
+    private void Awake()
+    {
+        
+    }
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -32,18 +45,27 @@ public class PlayerMovement : MonoBehaviour
         {
             rb.freezeRotation = true;
         }
+
+        if (gameObject.tag == "Player1")
+        {
+            PlayerID = "Player1";
+        }
+        else if (gameObject.tag == "Player2")
+        {
+            PlayerID = "Player2";
+        }
     }
 
     void Update()
     {
         // Get input
-        horizontalInput = Input.GetAxisRaw("Horizontal");
+        horizontalInput = Input.GetAxisRaw(PlayerID+"_"+"Horizontal");
         
         // Check if grounded
         isGrounded = Physics.CheckSphere(groundCheck.position, groundCheckRadius, groundLayer);
         
         // Jump input
-        if (Input.GetButtonDown("Jump") && isGrounded)
+        if (Input.GetButtonDown(PlayerID + "_" + "Jump") && isGrounded)
         {
             Jump();
         }
@@ -70,6 +92,7 @@ public class PlayerMovement : MonoBehaviour
     
     private void Jump()
     {
+        animator.SetTrigger("Jump");
         rb.linearVelocity = new Vector3(rb.linearVelocity.x, jumpForce, rb.linearVelocity.z);
     }
     
@@ -90,15 +113,22 @@ public class PlayerMovement : MonoBehaviour
         isFacingRight = !isFacingRight;
         transform.Rotate(0f, 180f, 0f);
     }
-    
+
     private void UpdateAnimations()
     {
         if (animator != null)
         {
             // Set animation parameters (create these in your Animator Controller)
             animator.SetFloat("Speed", Mathf.Abs(horizontalInput));
-            animator.SetBool("IsGrounded", isGrounded);
             animator.SetFloat("VelocityY", rb.linearVelocity.y);
+            if (Input.GetButtonDown(PlayerID + "_" + "Attack"))
+            {
+                Debug.Log($"{PlayerID} attacks!");
+            }
+            if (Input.GetButtonDown(PlayerID + "_" + "Block"))
+            {
+                Debug.Log($"{PlayerID} blocks!");
+            }
         }
     }
     
@@ -113,6 +143,10 @@ public class PlayerMovement : MonoBehaviour
     }
     public int getHealth()
     {
-        return Random.Range(1, 20);
+        return health;
+    }
+    public int getStamina()
+    {
+        return stamina;
     }
 }

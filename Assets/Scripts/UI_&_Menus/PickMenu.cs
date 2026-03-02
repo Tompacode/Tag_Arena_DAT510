@@ -19,8 +19,6 @@ public class PickMenu : MonoBehaviour
 
     // Counters 
     int pickStep = 0;
-    int player1TeamIndex = 0;
-    int player2TeamIndex = 0;
 
     public Transform Player1Pick1Pos;
     public Transform Player1Pick2Pos;
@@ -62,7 +60,6 @@ public class PickMenu : MonoBehaviour
 
     void Start()
     {
-        PlayButton.enabled = false;
         PickedCharacterPos = new Transform[]
         {
             Player1Pick1Pos,
@@ -85,6 +82,10 @@ public class PickMenu : MonoBehaviour
         {
            PlayButton.enabled = true;
         }
+        else
+        {
+            PlayButton.enabled = false;
+        }
     }
 
     void UpdatePickerText()
@@ -101,16 +102,13 @@ public class PickMenu : MonoBehaviour
             }
         }
     }
-    void ResetSelection()
+    public void ResetSelection()
     {
         pickStep = 0;
         currentPicker = Picker.Player1;
 
         player1Team.Clear();
         player2Team.Clear();
-
-        player1TeamIndex = 0;
-        player2TeamIndex = 0;
 
         if (gm != null)
             gm.ClearTeams();
@@ -135,21 +133,17 @@ public class PickMenu : MonoBehaviour
         }
 
         UpdatePickerText();
-
-        Debug.Log("Character select reset");
     }
 
     public void GoToMainMenu()
     {
         SceneManager.LoadScene("MainMenu"); 
-        Debug.Log("Back to main menu");
 
     }
 
     public void finishedSelectionPlay()
     {
         SceneManager.LoadScene("Game");
-        Debug.Log("To Game Scene"); 
     }
 
     public void enable3DModelWhenPicked(string characterName)
@@ -172,7 +166,6 @@ public class PickMenu : MonoBehaviour
             if (child.name.Contains(characterName))
             {
                 child.SetActive(true);
-                Debug.Log("Enabled model: " + child.name);
                 break;
             }
 
@@ -191,7 +184,6 @@ public class PickMenu : MonoBehaviour
         // 1 2 2 1 
         if (pickStep >= pickOrder.Length - 1)
         {
-            Debug.Log("Selection complete!");
 
             if (menuPanelTextField != null)
                 menuPanelTextField.text = "Selection complete";
@@ -205,10 +197,9 @@ public class PickMenu : MonoBehaviour
         UpdatePickerText();
     }
 
-    void registerPick(string characterName, Button clickedButton)
+    private void registerPick(string characterName, Button clickedButton)
     {
         if (pickStep >= pickOrder.Length){
-            Debug.Log("Selection already complete");
             return;
         }
 
@@ -220,14 +211,7 @@ public class PickMenu : MonoBehaviour
             }
 
             player1Team.Add(characterName);
-
-            if (player1TeamIndex < gm.player1Team.Length)
-            {
-                gm.player1Team[player1TeamIndex] = characterName;
-                player1TeamIndex++;
-            }
-
-            Debug.Log("Player 1 selected: " + characterName);
+            gm.AddToTeam(characterName, 1);
         }
         else
         {
@@ -237,14 +221,7 @@ public class PickMenu : MonoBehaviour
             }
 
             player2Team.Add(characterName);
-
-            if (player2TeamIndex < gm.player2Team.Length)
-            {
-                gm.player2Team[player2TeamIndex] = characterName;
-                player2TeamIndex++;
-            }
-
-            Debug.Log("Player 2 selected: " + characterName);
+            gm.AddToTeam(characterName, 2);
         }
 
         if (clickedButton != null)
@@ -255,7 +232,6 @@ public class PickMenu : MonoBehaviour
         if (pickStep < PickedCharacterPos.Length && PickedCharacterPos[pickStep] != null)
         {
             Transform pos = PickedCharacterPos[pickStep];
-            Debug.Log(characterName + " stands at position: " + pos.name);
         }
 
         enable3DModelWhenPicked(characterName);
@@ -269,33 +245,21 @@ public class PickMenu : MonoBehaviour
 
     public void KnightClicked()
     {
-        Debug.Log("Knight selected");
-
         registerPick("Knight", KnightButton);
     }
 
     public void VikingFemaleClicked()
     {
-        Debug.Log("Viking female selected");
-
         registerPick("VikingFemale", VikingFemaleButton);
     }
 
     public void GladiatorClicked()
-    {
-        Debug.Log("Gladiator selected");
-
+    { 
         registerPick("Gladiator", GladiatorButton);
     }
 
     public void SamuraiClicked()
     {
-        Debug.Log("Samurai selected");
-
         registerPick("Samurai", SamuraiButton);
     }
-
-
-
-
 }
