@@ -1,4 +1,3 @@
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
@@ -12,12 +11,15 @@ public class PlayerMovement : MonoBehaviour
     private int stamina = 100;
     [SerializeField]
     private float speed = 5f;
+    [SerializeField] [Range(0f, 1f)]
+    private float blockDamageMultiplier = 0.5f;
+    [SerializeField]
+    private float attackCooldown = 0.5f;
 
     [Header("Movement Settings")]
-    
     [SerializeField]
     private float jumpForce = 5f;
-    
+
     [Header("Ground Check")]
     [SerializeField]
     private Transform groundCheck;
@@ -25,89 +27,227 @@ public class PlayerMovement : MonoBehaviour
     private float groundCheckRadius = 0.2f;
     [SerializeField]
     private LayerMask groundLayer;
-    
+
     private Rigidbody rb;
     private Animator animator;
     private bool isGrounded;
     private float horizontalInput;
     private bool isFacingRight = true;
+    private bool isBlocking;
+    private bool isDead;
+    private float nextAttackTime;
+    private Transform opponent;
+
     private void Awake()
     {
-        
     }
-    void Start()
+
+    private void Start()
     {
         rb = GetComponent<Rigidbody>();
         animator = GetComponent<Animator>();
-        
-        // Freeze rotation to prevent character from tipping over
+
         if (rb != null)
         {
             rb.freezeRotation = true;
         }
 
-        if (gameObject.tag == "Player1")
+        if (CompareTag("Player1"))
         {
             PlayerID = "Player1";
         }
-        else if (gameObject.tag == "Player2")
+        else if (CompareTag("Player2"))
         {
             PlayerID = "Player2";
         }
     }
 
-    void Update()
+    private void Update()
     {
-        // Get input
-        horizontalInput = Input.GetAxisRaw(PlayerID+"_"+"Horizontal");
-        
-        // Check if grounded
+        if (isDead)
+        {
+            return;
+        }
+
+        horizontalInput = Input.GetAxisRaw(PlayerID + "_" + "Horizontal");
         isGrounded = Physics.CheckSphere(groundCheck.position, groundCheckRadius, groundLayer);
-        
-        // Jump input
+
         if (Input.GetButtonDown(PlayerID + "_" + "Jump") && isGrounded)
         {
             Jump();
         }
-        
-        // Handle sprite flipping
-        FlipCharacter();
-        
-        // Update animations
+
+        if (Input.GetButtonDown(PlayerID + "_" + "Attack"))
+        {
+            TriggerAttack();
+        }
+
+        if (Input.GetButtonDown(PlayerID + "_" + "Block"))
+        {
+            StartBlock();
+        }
+
+        if (Input.GetButtonUp(PlayerID + "_" + "Block"))
+        {
+            StopBlock();
+        }
+
+        FaceOpponent();
         UpdateAnimations();
     }
-    
-    void FixedUpdate()
+
+    private void FixedUpdate()
     {
-        // Apply movement
+        if (isDead)
+        {
+            return;
+        }
+
         Move();
     }
-    
+
     private void Move()
     {
-        // Move on X and Z axis (Z for depth if needed, or keep it 0 for pure side-scroller)
         Vector3 movement = new Vector3(horizontalInput * speed, rb.linearVelocity.y, 0f);
         rb.linearVelocity = movement;
     }
-    
+
     private void Jump()
     {
         animator.SetTrigger("Jump");
         rb.linearVelocity = new Vector3(rb.linearVelocity.x, jumpForce, rb.linearVelocity.z);
     }
-    
-    private void FlipCharacter()
+
+    private void TriggerAttack()
     {
-        if (horizontalInput > 0 && !isFacingRight)
+        if (animator == null)
+        {
+            return;
+        }
+
+        if (Time.time < nextAttackTime)
+        {
+            return;
+        }
+
+        animator.SetTrigger("Attack");
+        nextAttackTime = Time.time + attackCooldown;
+    }
+
+    private void StartBlock()
+    {
+        SetBlocking(true);
+    }
+
+    private void StopBlock()
+    {
+        SetBlocking(false);
+    }
+
+    private void SetBlocking(bool value)
+    {
+        isBlocking = value;
+
+        if (animator != null)
+        {
+            animator.SetBool("IsBlocking", isBlocking);
+        }
+    }
+
+    public void SetOpponent(Transform opp)
+    {
+        opponent = opp;
+        FaceOpponentImmediate();
+    }
+
+    private void FaceOpponentImmediate()
+    {
+        if (opponent == null)
+        {
+            return;
+        }
+
+        float direction = opponent.position.x - transform.position.x;
+        if (direction > 0f && !isFacingRight)
         {
             Flip();
         }
-        else if (horizontalInput < 0 && isFacingRight)
+        else if (direction < 0f && isFacingRight)
         {
             Flip();
         }
     }
-    
+
+    public void TakeDamage(int amount, string attackerTag)
+    {
+        if (isDead || amount <= 0)
+        {
+            return;
+        }
+
+        if (!string.IsNullOrEmpty(attackerTag) && CompareTag(attackerTag))
+        {
+            return;
+        }
+
+        float modifier = isBlocking ? blockDamageMultiplier : 1f;
+        int finalDamage = Mathf.Max(1, Mathf.CeilToInt(amount * modifier));
+
+        health = Mathf.Max(health - finalDamage, 0);
+
+        if (health <= 0)
+        {
+            Die();
+        }
+        else
+        {
+            animator?.SetTrigger("Hit");
+        }
+    }
+
+    private void Die()
+    {
+        if (isDead)
+        {
+            return;
+        }
+
+        isDead = true;
+
+        animator?.SetTrigger("Die");
+
+        foreach (Collider c in GetComponentsInChildren<Collider>())
+        {
+            c.enabled = false;
+        }
+
+        if (rb != null)
+        {
+            rb.linearVelocity = Vector3.zero;
+            rb.isKinematic = true;
+        }
+
+        PlayerManager.Instance?.OnPlayerDeath(this);
+    }
+
+    private void FaceOpponent()
+    {
+        if (opponent == null)
+        {
+            return;
+        }
+
+        float direction = opponent.position.x - transform.position.x;
+        if (direction > 0f && !isFacingRight)
+        {
+            Flip();
+        }
+        else if (direction < 0f && isFacingRight)
+        {
+            Flip();
+        }
+    }
+
     private void Flip()
     {
         isFacingRight = !isFacingRight;
@@ -118,21 +258,11 @@ public class PlayerMovement : MonoBehaviour
     {
         if (animator != null)
         {
-            // Set animation parameters (create these in your Animator Controller)
             animator.SetFloat("Speed", Mathf.Abs(horizontalInput));
             animator.SetFloat("VelocityY", rb.linearVelocity.y);
-            if (Input.GetButtonDown(PlayerID + "_" + "Attack"))
-            {
-                Debug.Log($"{PlayerID} attacks!");
-            }
-            if (Input.GetButtonDown(PlayerID + "_" + "Block"))
-            {
-                Debug.Log($"{PlayerID} blocks!");
-            }
         }
     }
-    
-    // Visualize ground check in editor
+
     private void OnDrawGizmosSelected()
     {
         if (groundCheck != null)
@@ -141,10 +271,12 @@ public class PlayerMovement : MonoBehaviour
             Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
         }
     }
+
     public int getHealth()
     {
         return health;
     }
+
     public int getStamina()
     {
         return stamina;

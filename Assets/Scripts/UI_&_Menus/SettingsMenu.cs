@@ -33,7 +33,7 @@ public class SettingsMenu : MonoBehaviour
         resolutionDropdown.SetValueWithoutNotify(currentResolutionIndex);
         resolutionDropdown.RefreshShownValue();
         for (int i = 0; i < options.Count; i++){
-            resolutionDropdown.
+            resolutionDropdown.AddOptions(options);
         }
 
     }

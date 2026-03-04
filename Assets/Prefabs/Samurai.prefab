@@ -533,8 +533,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7287912311908627824}
-  - component: {fileID: 1951392870196042882}
   - component: {fileID: 7399080335988474760}
+  - component: {fileID: 1951392870196042882}
   - component: {fileID: 6171050471814850045}
   - component: {fileID: 7938380230996606815}
   m_Layer: 0
@@ -562,6 +562,30 @@ Transform:
   - {fileID: 3523217352154840599}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
+--- !u!114 &7399080335988474760
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2695654559273948122}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76e52d2d633ae374285cfd61e2431272, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  PlayerID: 
+  health: 100
+  stamina: 100
+  speed: 5
+  blockDamageMultiplier: 0.8
+  attackCooldown: 0.5
+  jumpForce: 5
+  groundCheck: {fileID: 3523217352154840599}
+  groundCheckRadius: 0.2
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 8
 --- !u!95 &1951392870196042882
 Animator:
   serializedVersion: 7
@@ -584,28 +608,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &7399080335988474760
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2695654559273948122}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 76e52d2d633ae374285cfd61e2431272, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  PlayerID: 
-  health: 100
-  stamina: 100
-  speed: 5
-  jumpForce: 5
-  groundCheck: {fileID: 3523217352154840599}
-  groundCheckRadius: 0.2
-  groundLayer:
-    serializedVersion: 2
-    m_Bits: 0
 --- !u!64 &6171050471814850045
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -888,7 +890,8 @@ GameObject:
   - component: {fileID: 7641518201074085033}
   - component: {fileID: 8702298753024119887}
   - component: {fileID: 7230088693860532699}
-  - component: {fileID: 1913721816964053352}
+  - component: {fileID: 8323866218146032928}
+  - component: {fileID: 8846386228396986126}
   m_Layer: 0
   m_Name: SM_Wep_Odachi_01
   m_TagString: Untagged
@@ -964,8 +967,22 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &1913721816964053352
-MeshCollider:
+--- !u!114 &8323866218146032928
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3575530285983241681}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f018858f7523bb44932a2da624678f1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  damage: 35
+  ownerTag: Player1
+--- !u!65 &8846386228396986126
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -979,13 +996,12 @@ MeshCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 43448312677071058, guid: 97d780cd24e029c479f4479908356198, type: 2}
+  serializedVersion: 3
+  m_Size: {x: 0.07746155, y: 0.77811885, z: 0.1903155}
+  m_Center: {x: -0.00000030414347, y: 0.88, z: -0.03257094}
 --- !u!1 &3693935706513956471
 GameObject:
   m_ObjectHideFlags: 0

@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class PlayerManager : MonoBehaviour
 {
+    public static PlayerManager Instance;
+
     [SerializeField] private UIManager UIManager;
     [SerializeField] private GameManager gm;
 
@@ -19,6 +21,13 @@ public class PlayerManager : MonoBehaviour
 
     private void Awake()
     {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
         gm = GameManager.Instance;
     }
 
@@ -32,6 +41,8 @@ public class PlayerManager : MonoBehaviour
 
         activePlayer2 = SpawnCharacter(GetCharacterPrefab(gm.player2TeamList, 0), spawnPointPlayer2, "Player2");
         inactivePlayer2 = SpawnCharacter(GetCharacterPrefab(gm.player2TeamList, 1), benchPointPlayer2, "Player2");
+
+        UpdateOpponents();
     }
 
     private void Update()
@@ -59,6 +70,8 @@ public class PlayerManager : MonoBehaviour
 
         MoveTo(activePlayer1, spawnPointPlayer1);
         MoveTo(inactivePlayer1, benchPointPlayer1);
+
+        UpdateOpponents();
     }
 
     private void SwapPlayer2()
@@ -73,6 +86,65 @@ public class PlayerManager : MonoBehaviour
 
         MoveTo(activePlayer2, spawnPointPlayer2);
         MoveTo(inactivePlayer2, benchPointPlayer2);
+
+        UpdateOpponents();
+    }
+
+    public void OnPlayerDeath(PlayerMovement deadPlayer)
+    {
+        if (deadPlayer == null)
+        {
+            return;
+        }
+
+        string tag = deadPlayer.tag;
+
+        if (tag == "Player1")
+        {
+            if (activePlayer1 == deadPlayer.gameObject)
+            {
+                if (inactivePlayer1 != null)
+                {
+                    Destroy(activePlayer1);
+                    activePlayer1 = inactivePlayer1;
+                    inactivePlayer1 = null;
+                    MoveTo(activePlayer1, spawnPointPlayer1);
+                    UpdateOpponents();
+                }
+                else
+                {
+                    gm?.EndGame("Player1");
+                }
+            }
+            else if (inactivePlayer1 == deadPlayer.gameObject)
+            {
+                Destroy(inactivePlayer1);
+                inactivePlayer1 = null;
+            }
+        }
+        else if (tag == "Player2")
+        {
+            if (activePlayer2 == deadPlayer.gameObject)
+            {
+                if (inactivePlayer2 != null)
+                {
+                    Destroy(activePlayer2);
+                    activePlayer2 = inactivePlayer2;
+                    inactivePlayer2 = null;
+                    MoveTo(activePlayer2, spawnPointPlayer2);
+                    UpdateOpponents();
+                }
+                else
+                {
+                    gm?.EndGame("Player2");
+                }
+            }
+            else if (inactivePlayer2 == deadPlayer.gameObject)
+            {
+                Destroy(inactivePlayer2);
+                inactivePlayer2 = null;
+            }
+        }
     }
 
     private void MoveTo(GameObject obj, Transform point)
@@ -98,6 +170,22 @@ public class PlayerManager : MonoBehaviour
         return instance;
     }
 
+    private void UpdateOpponents()
+    {
+        var p1 = activePlayer1 != null ? activePlayer1.GetComponent<PlayerMovement>() : null;
+        var p2 = activePlayer2 != null ? activePlayer2.GetComponent<PlayerMovement>() : null;
+
+        if (p1 != null)
+        {
+            p1.SetOpponent(activePlayer2 != null ? activePlayer2.transform : null);
+        }
+
+        if (p2 != null)
+        {
+            p2.SetOpponent(activePlayer1 != null ? activePlayer1.transform : null);
+        }
+    }
+
     private static GameObject GetCharacterPrefab(System.Collections.Generic.List<GameManager.Character> team, int index)
     {
         if (team == null || index < 0 || index >= team.Count)
@@ -118,5 +206,4 @@ public class PlayerManager : MonoBehaviour
     public GameObject GetInactivePlayer1() => inactivePlayer1;
     public GameObject GetActivePlayer2() => activePlayer2;
     public GameObject GetInactivePlayer2() => inactivePlayer2;
-
 }
