@@ -15,10 +15,12 @@ public class PlayerManager : MonoBehaviour
 
     private GameObject activePlayer1;
     private GameObject inactivePlayer1;
-
+    
     private GameObject activePlayer2;
     private GameObject inactivePlayer2;
 
+    public GameObject gameOverUI;
+    
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -41,6 +43,12 @@ public class PlayerManager : MonoBehaviour
 
         activePlayer2 = SpawnCharacter(GetCharacterPrefab(gm.player2TeamList, 0), spawnPointPlayer2, "Player2");
         inactivePlayer2 = SpawnCharacter(GetCharacterPrefab(gm.player2TeamList, 1), benchPointPlayer2, "Player2");
+
+        // Set initial states
+        SetPlayerActive(activePlayer1, true);
+        SetPlayerActive(inactivePlayer1, false);
+        SetPlayerActive(activePlayer2, true);
+        SetPlayerActive(inactivePlayer2, false);
 
         UpdateOpponents();
     }
@@ -66,6 +74,10 @@ public class PlayerManager : MonoBehaviour
             return;
         }
 
+        // Disable current active, enable current inactive
+        SetPlayerActive(activePlayer1, false);
+        SetPlayerActive(inactivePlayer1, true);
+
         (activePlayer1, inactivePlayer1) = (inactivePlayer1, activePlayer1);
 
         MoveTo(activePlayer1, spawnPointPlayer1);
@@ -81,6 +93,10 @@ public class PlayerManager : MonoBehaviour
             Debug.LogWarning("SwapPlayer2 skipped: player2TeamList needs at least two characters.");
             return;
         }
+
+        // Disable current active, enable current inactive
+        SetPlayerActive(activePlayer2, false);
+        SetPlayerActive(inactivePlayer2, true);
 
         (activePlayer2, inactivePlayer2) = (inactivePlayer2, activePlayer2);
 
@@ -105,20 +121,26 @@ public class PlayerManager : MonoBehaviour
             {
                 if (inactivePlayer1 != null)
                 {
-                    Destroy(activePlayer1);
+                    // Disable dead player
+                    SetPlayerActive(activePlayer1, false);
+                    
+                    // Swap bench player to active
                     activePlayer1 = inactivePlayer1;
                     inactivePlayer1 = null;
+                    
+                    SetPlayerActive(activePlayer1, true);
                     MoveTo(activePlayer1, spawnPointPlayer1);
                     UpdateOpponents();
                 }
                 else
                 {
                     gm?.EndGame("Player1");
+                    gameOverUI.SetActive(true);
                 }
             }
             else if (inactivePlayer1 == deadPlayer.gameObject)
             {
-                Destroy(inactivePlayer1);
+                SetPlayerActive(inactivePlayer1, false);
                 inactivePlayer1 = null;
             }
         }
@@ -128,22 +150,47 @@ public class PlayerManager : MonoBehaviour
             {
                 if (inactivePlayer2 != null)
                 {
-                    Destroy(activePlayer2);
+                    // Disable dead player
+                    SetPlayerActive(activePlayer2, false);
+                    
+                    // Swap bench player to active
                     activePlayer2 = inactivePlayer2;
                     inactivePlayer2 = null;
+                    
+                    SetPlayerActive(activePlayer2, true);
                     MoveTo(activePlayer2, spawnPointPlayer2);
                     UpdateOpponents();
                 }
                 else
                 {
                     gm?.EndGame("Player2");
+                    gameOverUI?.SetActive(true);
                 }
             }
             else if (inactivePlayer2 == deadPlayer.gameObject)
             {
-                Destroy(inactivePlayer2);
+                SetPlayerActive(inactivePlayer2, false);
                 inactivePlayer2 = null;
             }
+        }
+        deadPlayer.gameObject.SetActive(false);
+    }
+
+    private void SetPlayerActive(GameObject player, bool isActive)
+    {
+        if (player == null) return;
+
+        PlayerMovement pm = player.GetComponent<PlayerMovement>();
+        if (pm != null)
+        {
+            pm.enabled = isActive;
+        }
+
+        // Optionally disable Animator to stop animations on bench
+        Animator animator = player.GetComponent<Animator>();
+        if (animator != null)
+        {
+            animator.enabled = isActive;
         }
     }
 

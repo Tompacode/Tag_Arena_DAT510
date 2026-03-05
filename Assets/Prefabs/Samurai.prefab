@@ -535,8 +535,8 @@ GameObject:
   - component: {fileID: 7287912311908627824}
   - component: {fileID: 7399080335988474760}
   - component: {fileID: 1951392870196042882}
-  - component: {fileID: 6171050471814850045}
   - component: {fileID: 7938380230996606815}
+  - component: {fileID: 4369453083917570495}
   m_Layer: 0
   m_Name: Samurai
   m_TagString: Untagged
@@ -608,28 +608,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!64 &6171050471814850045
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2695654559273948122}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 4300030, guid: 1d561ab794bc05b44aa243d39691c790, type: 3}
 --- !u!54 &7938380230996606815
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -655,8 +633,29 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 8
   m_CollisionDetection: 0
+--- !u!65 &4369453083917570495
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2695654559273948122}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 2, z: 1}
+  m_Center: {x: 0, y: 1, z: 0}
 --- !u!1 &2734601325232796030
 GameObject:
   m_ObjectHideFlags: 0
@@ -981,6 +980,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damage: 35
   ownerTag: Player1
+  hitResetTime: 0.5
+  damageCollider: {fileID: 8846386228396986126}
 --- !u!65 &8846386228396986126
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1000,8 +1001,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.07746155, y: 0.77811885, z: 0.1903155}
-  m_Center: {x: -0.00000030414347, y: 0.88, z: -0.03257094}
+  m_Size: {x: 0.07746155, y: 1, z: 0.1903155}
+  m_Center: {x: -0.00000030414347, y: 0.8, z: -0.03257094}
 --- !u!1 &3693935706513956471
 GameObject:
   m_ObjectHideFlags: 0

@@ -557,8 +557,8 @@ GameObject:
   - component: {fileID: 6111707140909466124}
   - component: {fileID: 4252090462102554999}
   - component: {fileID: 6443171171555775438}
-  - component: {fileID: 2180442971505970890}
   - component: {fileID: 673960783677695497}
+  - component: {fileID: 4954588608646712774}
   m_Layer: 0
   m_Name: VikingFemale
   m_TagString: Untagged
@@ -625,38 +625,11 @@ Animator:
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
   m_AnimatePhysics: 0
-  m_WarningMessage: "\nBinding warning: Some generic clip(s) animate transforms that
-    are already bound by a Humanoid avatar. These transforms can only be changed
-    by Humanoid clips.\n\tTransform 'Root'\n\tTransform 'Elbow_R'\n\tTransform 'Finger_02'\n\tTransform
-    'Thumb_02'\n\tTransform 'Clavicle_L'\n\tTransform 'Finger_01'\n\tTransform 'IndexFinger_03'\n\tTransform
-    'UpperLeg_L'\n\tTransform 'UpperLeg_R'\n\tTransform 'Hand_L'\n\tand more ...\n\tFrom
-    animation clip 'OneHand_Block_Idle'"
+  m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!64 &2180442971505970890
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2747697646010744936}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 4300036, guid: a177b0e6ff26a894180468c168e802cc, type: 3}
 --- !u!54 &673960783677695497
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -682,8 +655,29 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 8
   m_CollisionDetection: 0
+--- !u!65 &4954588608646712774
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2747697646010744936}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 2, z: 1}
+  m_Center: {x: 0, y: 1, z: 0}
 --- !u!1 &2905998474461881310
 GameObject:
   m_ObjectHideFlags: 0
@@ -2141,6 +2135,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damage: 20
   ownerTag: Player1
+  hitResetTime: 0.5
+  damageCollider: {fileID: 3133897427194884495}
 --- !u!65 &3133897427194884495
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2160,8 +2156,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.2361401, y: 0.5, z: 0.05437867}
-  m_Center: {x: 0.00000051663824, y: 0.65, z: -0.000007855743}
+  m_Size: {x: 0.2361401, y: 1.2, z: 0.05437867}
+  m_Center: {x: 0.00000051663824, y: 0.35, z: -0.000007855743}
 --- !u!1001 &6098519122289678366
 PrefabInstance:
   m_ObjectHideFlags: 0

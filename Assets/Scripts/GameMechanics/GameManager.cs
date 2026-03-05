@@ -20,6 +20,8 @@ public class GameManager : MonoBehaviour
     private int player1Remaining;
     private int player2Remaining;
 
+    
+
     private void Awake()
     {
         if (Instance != null && Instance != this)

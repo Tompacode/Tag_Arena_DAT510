@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class UIManager : MonoBehaviour
 {
@@ -31,18 +32,13 @@ public class UIManager : MonoBehaviour
     public Slider player1BenchStamina;
     public Slider player2BenchStamina;
 
+    private GameObject gameOverUI;
+
     private void Awake()
     {
         playerManager = GameObject.Find("PlayerManager").GetComponent<PlayerManager>();
     }
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-
-    }
-
-    // Update is called once per frame
     void Update()
     {
         UpdateUI();
@@ -55,27 +51,79 @@ public class UIManager : MonoBehaviour
         GameObject player2Active = playerManager.GetActivePlayer2();
         GameObject player2Bench = playerManager.GetInactivePlayer2();
 
-        player1ActiveHealth.value = player1Active.GetComponent<PlayerMovement>().getHealth();
-        player1BenchHealth.value = player1Bench.GetComponent<PlayerMovement>().getHealth();
-        player2ActiveHealth.value = player2Active.GetComponent<PlayerMovement>().getHealth();
-        player2BenchHealth.value = player2Bench.GetComponent<PlayerMovement>().getHealth();
+        // Update Player 1 Active
+        if (player1Active != null)
+        {
+            PlayerMovement pm1Active = player1Active.GetComponent<PlayerMovement>();
+            if (pm1Active != null)
+            {
+                player1ActiveHealth.value = pm1Active.getHealth();
+                player1ActiveStamina.value = pm1Active.getStamina();
+            }
+            player1ActiveHeadshot.sprite = GetHeadshot(player1Active);
+        }
 
-        player1ActiveStamina.value = player1Active.GetComponent<PlayerMovement>().getStamina();
-        player1BenchStamina.value = player1Bench.GetComponent<PlayerMovement>().getStamina();
-        player2ActiveStamina.value = player2Active.GetComponent<PlayerMovement>().getStamina();
-        player2BenchStamina.value = player2Bench.GetComponent<PlayerMovement>().getStamina();
+        // Update Player 1 Bench (may be null after death)
+        if (player1Bench != null)
+        {
+            PlayerMovement pm1Bench = player1Bench.GetComponent<PlayerMovement>();
+            if (pm1Bench != null)
+            {
+                player1BenchHealth.value = pm1Bench.getHealth();
+                player1BenchStamina.value = pm1Bench.getStamina();
+            }
+            player1BenchHeadshot.sprite = GetHeadshot(player1Bench);
+            player1BenchHeadshot.enabled = true;
+            player1BenchHealth.gameObject.SetActive(true);
+            player1BenchStamina.gameObject.SetActive(true);
+        }
+        else
+        {
+            // Hide bench UI when no bench player exists
+            player1BenchHeadshot.enabled = false;
+            player1BenchHealth.gameObject.SetActive(false);
+            player1BenchStamina.gameObject.SetActive(false);
+        }
 
-        player2BenchHeadshot.sprite = GetHeadshot(player2Bench);
-        player1BenchHeadshot.sprite = GetHeadshot(player1Bench);
-        player2ActiveHeadshot.sprite = GetHeadshot(player2Active);
-        player1ActiveHeadshot.sprite = GetHeadshot(player1Active);
+        // Update Player 2 Active
+        if (player2Active != null)
+        {
+            PlayerMovement pm2Active = player2Active.GetComponent<PlayerMovement>();
+            if (pm2Active != null)
+            {
+                player2ActiveHealth.value = pm2Active.getHealth();
+                player2ActiveStamina.value = pm2Active.getStamina();
+            }
+            player2ActiveHeadshot.sprite = GetHeadshot(player2Active);
+        }
 
+        // Update Player 2 Bench (may be null after death)
+        if (player2Bench != null)
+        {
+            PlayerMovement pm2Bench = player2Bench.GetComponent<PlayerMovement>();
+            if (pm2Bench != null)
+            {
+                player2BenchHealth.value = pm2Bench.getHealth();
+                player2BenchStamina.value = pm2Bench.getStamina();
+            }
+            player2BenchHeadshot.sprite = GetHeadshot(player2Bench);
+            player2BenchHeadshot.enabled = true;
+            player2BenchHealth.gameObject.SetActive(true);
+            player2BenchStamina.gameObject.SetActive(true);
+        }
+        else
+        {
+            // Hide bench UI when no bench player exists
+            player2BenchHeadshot.enabled = false;
+            player2BenchHealth.gameObject.SetActive(false);
+            player2BenchStamina.gameObject.SetActive(false);
+        }
     }
 
     Sprite GetHeadshot(GameObject obj)
     {
         if (obj == null) return null;
-        Debug.Log($"Getting headshot for {obj.name}");
+
         string n = obj.name.Replace("(Clone)", "").Trim();
 
         for (int i = 0; i < characters.Length; i++)
@@ -83,5 +131,14 @@ public class UIManager : MonoBehaviour
                 return characters[i].headshot;
 
         return null;
+    }
+
+    public void Restart()
+    {
+        //SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+    public void MainMenu()
+    {
+        //SceneManager.LoadScene("MainMenu"); set time
     }
 }

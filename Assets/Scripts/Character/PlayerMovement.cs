@@ -32,15 +32,10 @@ public class PlayerMovement : MonoBehaviour
     private Animator animator;
     private bool isGrounded;
     private float horizontalInput;
-    private bool isFacingRight = true;
     private bool isBlocking;
     private bool isDead;
     private float nextAttackTime;
     private Transform opponent;
-
-    private void Awake()
-    {
-    }
 
     private void Start()
     {
@@ -55,10 +50,14 @@ public class PlayerMovement : MonoBehaviour
         if (CompareTag("Player1"))
         {
             PlayerID = "Player1";
+            // Player1 faces right (default rotation)
+            transform.rotation = Quaternion.Euler(0f, 90f, 0);
         }
         else if (CompareTag("Player2"))
         {
             PlayerID = "Player2";
+            // Player2 faces left (180 degrees)
+            transform.rotation = Quaternion.Euler(0f, -90f, 0);
         }
     }
 
@@ -92,7 +91,6 @@ public class PlayerMovement : MonoBehaviour
             StopBlock();
         }
 
-        FaceOpponent();
         UpdateAnimations();
     }
 
@@ -157,25 +155,6 @@ public class PlayerMovement : MonoBehaviour
     public void SetOpponent(Transform opp)
     {
         opponent = opp;
-        FaceOpponentImmediate();
-    }
-
-    private void FaceOpponentImmediate()
-    {
-        if (opponent == null)
-        {
-            return;
-        }
-
-        float direction = opponent.position.x - transform.position.x;
-        if (direction > 0f && !isFacingRight)
-        {
-            Flip();
-        }
-        else if (direction < 0f && isFacingRight)
-        {
-            Flip();
-        }
     }
 
     public void TakeDamage(int amount, string attackerTag)
@@ -228,30 +207,6 @@ public class PlayerMovement : MonoBehaviour
         }
 
         PlayerManager.Instance?.OnPlayerDeath(this);
-    }
-
-    private void FaceOpponent()
-    {
-        if (opponent == null)
-        {
-            return;
-        }
-
-        float direction = opponent.position.x - transform.position.x;
-        if (direction > 0f && !isFacingRight)
-        {
-            Flip();
-        }
-        else if (direction < 0f && isFacingRight)
-        {
-            Flip();
-        }
-    }
-
-    private void Flip()
-    {
-        isFacingRight = !isFacingRight;
-        transform.Rotate(0f, 180f, 0f);
     }
 
     private void UpdateAnimations()

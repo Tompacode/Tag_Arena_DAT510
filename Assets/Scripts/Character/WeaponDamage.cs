@@ -10,7 +10,11 @@ public class WeaponDamage : MonoBehaviour
     [SerializeField]
     private string ownerTag = "Player1";
 
-    private readonly HashSet<int> hitTargets = new HashSet<int>();
+    [SerializeField]
+    private float hitResetTime = 0.5f;
+
+    [SerializeField]
+    private Collider damageCollider;
 
     private void Awake()
     {
@@ -25,11 +29,10 @@ public class WeaponDamage : MonoBehaviour
         }
     }
 
-    private void OnEnable()
+    private void Update()
     {
-        hitTargets.Clear();
+        //if (Input.GetButtonDown(ownerTag + "_" + "Attack")){damageCollider.enabled = true;}
     }
-
     private void OnTriggerEnter(Collider other)
     {
         if (string.IsNullOrEmpty(ownerTag))
@@ -41,30 +44,17 @@ public class WeaponDamage : MonoBehaviour
         int targetId = root.GetInstanceID();
 
         // Ignore self/owner and prevent multiple hits on the same target per swing
-        if (root.CompareTag(ownerTag) || hitTargets.Contains(targetId))
+        if (root.CompareTag(ownerTag))
         {
             return;
         }
 
-        hitTargets.Add(targetId);
+        
 
         if (root.TryGetComponent(out PlayerMovement target))
         {
             target.TakeDamage(damage, ownerTag);
+            //damageCollider.enabled = false;
         }
-    }
-
-    private void Reset()
-    {
-        Collider c = GetComponent<Collider>();
-        if (c != null)
-        {
-            c.isTrigger = true;
-        }
-    }
-
-    public void ClearHitCache()
-    {
-        hitTargets.Clear();
     }
 }
