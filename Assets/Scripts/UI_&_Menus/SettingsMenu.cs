@@ -1,56 +1,83 @@
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using TMPro;
 
 public class SettingsMenu : MonoBehaviour
 {
     public TMP_Dropdown resolutionDropdown;
 
-    Resolution[] resolutions;
+    private Resolution[] resolutions;
+    private bool hasAutoScrolledOpenList;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start(){
+    private void Start()
+    {
         resolutions = Screen.resolutions;
-
         resolutionDropdown.ClearOptions();
-        
+
         List<string> options = new List<string>();
         int currentResolutionIndex = 0;
 
-        for (int i = 0; i < resolutions.Length; i++){
+        for (int i = 0; i < resolutions.Length; i++)
+        {
             string option = resolutions[i].width + " x " + resolutions[i].height;
             options.Add(option);
 
-            if (resolutions[i].width == Screen.currentResolution.width &&
-                resolutions[i].height == Screen.currentResolution.height){
-                    currentResolutionIndex = i;
-                }
+            if (resolutions[i].width == Screen.width &&
+                resolutions[i].height == Screen.height)
+            {
+                currentResolutionIndex = i;
+            }
         }
 
         resolutionDropdown.AddOptions(options);
         resolutionDropdown.SetValueWithoutNotify(currentResolutionIndex);
         resolutionDropdown.RefreshShownValue();
-        for (int i = 0; i < options.Count; i++){
-            resolutionDropdown.AddOptions(options);
-        }
-
     }
 
-    public void SetResolution(int resolutionIndex){
+    private void Update()
+    {
+        AutoScrollOpenDropdownToCurrentSelection();
+    }
+
+    public void SetResolution(int resolutionIndex)
+    {
         Resolution resolution = resolutions[resolutionIndex];
         Screen.SetResolution(resolution.width, resolution.height, Screen.fullScreen);
         Debug.Log($"Set resolution to {resolution.width} x {resolution.height}");
     }
 
-    public void MainMenu(){
+    public void MainMenu()
+    {
         SceneManager.LoadScene("MainMenu");
     }
 
-    // Update is called once per frame
-    void Update()
+    private void AutoScrollOpenDropdownToCurrentSelection()
     {
-        
+        GameObject openList = GameObject.Find("Dropdown List");
+
+        if (openList == null)
+        {
+            hasAutoScrolledOpenList = false;
+            return;
+        }
+
+        if (hasAutoScrolledOpenList)
+        {
+            return;
+        }
+
+        ScrollRect scrollRect = openList.GetComponentInChildren<ScrollRect>();
+        if (scrollRect == null || resolutionDropdown.options.Count <= 1)
+        {
+            hasAutoScrolledOpenList = true;
+            return;
+        }
+
+        float t = (float)resolutionDropdown.value / (resolutionDropdown.options.Count - 1);
+        scrollRect.verticalNormalizedPosition = 1f - Mathf.Clamp01(t);
+
+        hasAutoScrolledOpenList = true;
     }
 }

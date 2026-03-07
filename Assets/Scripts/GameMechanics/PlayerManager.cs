@@ -4,23 +4,21 @@ public class PlayerManager : MonoBehaviour
 {
     public static PlayerManager Instance;
 
-    [SerializeField] private UIManager UIManager;
+    [SerializeField] private UIManager uiManager;
     [SerializeField] private GameManager gm;
 
     public Transform spawnPointPlayer1;
     public Transform spawnPointPlayer2;
-
+        
     public Transform benchPointPlayer1;
     public Transform benchPointPlayer2;
 
     private GameObject activePlayer1;
     private GameObject inactivePlayer1;
-    
+
     private GameObject activePlayer2;
     private GameObject inactivePlayer2;
 
-    public GameObject gameOverUI;
-    
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -31,6 +29,11 @@ public class PlayerManager : MonoBehaviour
 
         Instance = this;
         gm = GameManager.Instance;
+
+        if (uiManager == null)
+        {
+            uiManager = Object.FindFirstObjectByType<UIManager>();
+        }
     }
 
     private void Start()
@@ -44,13 +47,10 @@ public class PlayerManager : MonoBehaviour
         activePlayer2 = SpawnCharacter(GetCharacterPrefab(gm.player2TeamList, 0), spawnPointPlayer2, "Player2");
         inactivePlayer2 = SpawnCharacter(GetCharacterPrefab(gm.player2TeamList, 1), benchPointPlayer2, "Player2");
 
-        // Set initial states
         SetPlayerActive(activePlayer1, true);
         SetPlayerActive(inactivePlayer1, false);
         SetPlayerActive(activePlayer2, true);
         SetPlayerActive(inactivePlayer2, false);
-
-        UpdateOpponents();
     }
 
     private void Update()
@@ -74,16 +74,11 @@ public class PlayerManager : MonoBehaviour
             return;
         }
 
-        // Disable current active, enable current inactive
         SetPlayerActive(activePlayer1, false);
         SetPlayerActive(inactivePlayer1, true);
 
+        SwapTransforms(activePlayer1, inactivePlayer1);
         (activePlayer1, inactivePlayer1) = (inactivePlayer1, activePlayer1);
-
-        MoveTo(activePlayer1, spawnPointPlayer1);
-        MoveTo(inactivePlayer1, benchPointPlayer1);
-
-        UpdateOpponents();
     }
 
     private void SwapPlayer2()
@@ -94,16 +89,25 @@ public class PlayerManager : MonoBehaviour
             return;
         }
 
-        // Disable current active, enable current inactive
         SetPlayerActive(activePlayer2, false);
         SetPlayerActive(inactivePlayer2, true);
 
+        SwapTransforms(activePlayer2, inactivePlayer2);
         (activePlayer2, inactivePlayer2) = (inactivePlayer2, activePlayer2);
+    }
 
-        MoveTo(activePlayer2, spawnPointPlayer2);
-        MoveTo(inactivePlayer2, benchPointPlayer2);
+    private static void SwapTransforms(GameObject first, GameObject second) 
+    {
+        if (first == null || second == null)
+        {
+            return;
+        }
 
-        UpdateOpponents();
+        Vector3 firstPos = first.transform.position;
+        Quaternion firstRot = first.transform.rotation;
+
+        first.transform.SetPositionAndRotation(second.transform.position, second.transform.rotation);
+        second.transform.SetPositionAndRotation(firstPos, firstRot);
     }
 
     public void OnPlayerDeath(PlayerMovement deadPlayer)
@@ -114,6 +118,7 @@ public class PlayerManager : MonoBehaviour
         }
 
         string tag = deadPlayer.tag;
+        bool didReplaceActive = false;
 
         if (tag == "Player1")
         {
@@ -121,21 +126,18 @@ public class PlayerManager : MonoBehaviour
             {
                 if (inactivePlayer1 != null)
                 {
-                    // Disable dead player
                     SetPlayerActive(activePlayer1, false);
-                    
-                    // Swap bench player to active
+
                     activePlayer1 = inactivePlayer1;
                     inactivePlayer1 = null;
-                    
+
                     SetPlayerActive(activePlayer1, true);
-                    MoveTo(activePlayer1, spawnPointPlayer1);
-                    UpdateOpponents();
+                    didReplaceActive = true;
                 }
                 else
                 {
                     gm?.EndGame("Player1");
-                    gameOverUI.SetActive(true);
+                    uiManager?.ShowGameOver(gm?.GetWinner());
                 }
             }
             else if (inactivePlayer1 == deadPlayer.gameObject)
@@ -145,26 +147,23 @@ public class PlayerManager : MonoBehaviour
             }
         }
         else if (tag == "Player2")
-        {
+        {   
             if (activePlayer2 == deadPlayer.gameObject)
             {
                 if (inactivePlayer2 != null)
                 {
-                    // Disable dead player
                     SetPlayerActive(activePlayer2, false);
-                    
-                    // Swap bench player to active
+
                     activePlayer2 = inactivePlayer2;
                     inactivePlayer2 = null;
-                    
+
                     SetPlayerActive(activePlayer2, true);
-                    MoveTo(activePlayer2, spawnPointPlayer2);
-                    UpdateOpponents();
+                    didReplaceActive = true;
                 }
                 else
                 {
                     gm?.EndGame("Player2");
-                    gameOverUI?.SetActive(true);
+                    uiManager?.ShowGameOver(gm?.GetWinner());
                 }
             }
             else if (inactivePlayer2 == deadPlayer.gameObject)
@@ -173,12 +172,30 @@ public class PlayerManager : MonoBehaviour
                 inactivePlayer2 = null;
             }
         }
+
         deadPlayer.gameObject.SetActive(false);
+
+        if (didReplaceActive)
+        {
+            MoveTo(activePlayer1, spawnPointPlayer1);
+            MoveTo(activePlayer2, spawnPointPlayer2);
+        }
+    }
+
+    private static Vector3 GetReplacementPosition(Vector3 currentPos, Transform fallbackPoint)
+    {
+        // Keep current X/Z so replacement appears where fight happened,
+        // but force Y to a stable ground-level fallback to avoid spawning in air.
+        float groundedY = fallbackPoint != null ? fallbackPoint.position.y : currentPos.y;
+        return new Vector3(currentPos.x, groundedY, currentPos.z);
     }
 
     private void SetPlayerActive(GameObject player, bool isActive)
     {
-        if (player == null) return;
+        if (player == null)
+        {
+            return;
+        }
 
         PlayerMovement pm = player.GetComponent<PlayerMovement>();
         if (pm != null)
@@ -186,7 +203,6 @@ public class PlayerManager : MonoBehaviour
             pm.enabled = isActive;
         }
 
-        // Optionally disable Animator to stop animations on bench
         Animator animator = player.GetComponent<Animator>();
         if (animator != null)
         {
@@ -215,22 +231,6 @@ public class PlayerManager : MonoBehaviour
         var instance = Instantiate(prefab, spawnPoint.position, spawnPoint.rotation);
         instance.tag = tag;
         return instance;
-    }
-
-    private void UpdateOpponents()
-    {
-        var p1 = activePlayer1 != null ? activePlayer1.GetComponent<PlayerMovement>() : null;
-        var p2 = activePlayer2 != null ? activePlayer2.GetComponent<PlayerMovement>() : null;
-
-        if (p1 != null)
-        {
-            p1.SetOpponent(activePlayer2 != null ? activePlayer2.transform : null);
-        }
-
-        if (p2 != null)
-        {
-            p2.SetOpponent(activePlayer1 != null ? activePlayer1.transform : null);
-        }
     }
 
     private static GameObject GetCharacterPrefab(System.Collections.Generic.List<GameManager.Character> team, int index)

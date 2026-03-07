@@ -5,28 +5,30 @@ public class PlayerMovement : MonoBehaviour
     public string PlayerID;
 
     [Header("Stats")]
-    [SerializeField]
-    private int health = 100;
-    [SerializeField]
-    private int stamina = 100;
-    [SerializeField]
-    private float speed = 5f;
-    [SerializeField] [Range(0f, 1f)]
-    private float blockDamageMultiplier = 0.5f;
-    [SerializeField]
-    private float attackCooldown = 0.5f;
+    [SerializeField] private int health = 100;
+    [SerializeField] private float stamina = 100f;
+    [SerializeField] private int maxStamina = 100;
+    [SerializeField] private float staminaRegenPerSecond = 5f;
+    [SerializeField] private float speed = 5f;
+    [SerializeField] [Range(0f, 1f)] private float blockDamageMultiplier = 0.5f;
+    [SerializeField] private float attackCooldown = 1.5f;
+    [SerializeField] private int attackStaminaCost = 10;
+    [SerializeField] private float blockStaminaDrainPerSecond = 10f;
+    [SerializeField] private float jumpForce = 5f;
 
-    [Header("Movement Settings")]
-    [SerializeField]
-    private float jumpForce = 5f;
+    [Header("Input")]
+    [SerializeField] private float inputPressThreshold = 0.5f;
 
     [Header("Ground Check")]
-    [SerializeField]
-    private Transform groundCheck;
-    [SerializeField]
-    private float groundCheckRadius = 0.2f;
-    [SerializeField]
-    private LayerMask groundLayer;
+    [SerializeField] private Transform groundCheck;
+    [SerializeField] private float groundCheckRadius = 0.2f;
+    [SerializeField] private LayerMask groundLayer;
+
+    [Header("Combat")]
+    [SerializeField] private WeaponDamage weapon;
+    [SerializeField] private float hitboxActiveSeconds = 0.3f;
+
+    private int maxHealth;
 
     private Rigidbody rb;
     private Animator animator;
@@ -35,7 +37,14 @@ public class PlayerMovement : MonoBehaviour
     private bool isBlocking;
     private bool isDead;
     private float nextAttackTime;
-    private Transform opponent;
+
+    private bool wasAttackPressed;
+    private bool wasBlockPressed;
+
+    private void Awake()
+    {
+        maxHealth = health;
+    }
 
     private void Start()
     {
@@ -50,14 +59,19 @@ public class PlayerMovement : MonoBehaviour
         if (CompareTag("Player1"))
         {
             PlayerID = "Player1";
-            // Player1 faces right (default rotation)
-            transform.rotation = Quaternion.Euler(0f, 90f, 0);
+            transform.rotation = Quaternion.Euler(0f, 90f, 0f);
         }
         else if (CompareTag("Player2"))
         {
             PlayerID = "Player2";
-            // Player2 faces left (180 degrees)
-            transform.rotation = Quaternion.Euler(0f, -90f, 0);
+            transform.rotation = Quaternion.Euler(0f, -90f, 0f);
+        }
+
+        stamina = Mathf.Min(stamina, maxStamina);
+
+        if (weapon != null)
+        {
+            weapon.DisableHitBox();
         }
     }
 
@@ -69,28 +83,42 @@ public class PlayerMovement : MonoBehaviour
         }
 
         horizontalInput = Input.GetAxisRaw(PlayerID + "_" + "Horizontal");
-        isGrounded = Physics.CheckSphere(groundCheck.position, groundCheckRadius, groundLayer);
+        if (PlayerID == "Player1" && Input.GetAxisRaw(PlayerID + "_" + "Horizontal") > 0.3)
+        {
+            Debug.Log($"{PlayerID} horizontal input: {horizontalInput}");
+        }
+        isGrounded = groundCheck != null && Physics.CheckSphere(groundCheck.position, groundCheckRadius, groundLayer);
 
         if (Input.GetButtonDown(PlayerID + "_" + "Jump") && isGrounded)
         {
             Jump();
         }
 
-        if (Input.GetButtonDown(PlayerID + "_" + "Attack"))
+        float attackAxis = Input.GetAxisRaw(PlayerID + "_" + "Attack");
+        float blockAxis = Input.GetAxisRaw(PlayerID + "_" + "Block");
+
+        bool attackPressed = attackAxis > inputPressThreshold;
+        bool blockPressed = blockAxis > inputPressThreshold;
+
+        if (attackPressed && !wasAttackPressed)
         {
             TriggerAttack();
         }
 
-        if (Input.GetButtonDown(PlayerID + "_" + "Block"))
+        if (blockPressed && !wasBlockPressed)
         {
             StartBlock();
         }
-
-        if (Input.GetButtonUp(PlayerID + "_" + "Block"))
+        else if (!blockPressed && wasBlockPressed)
         {
             StopBlock();
         }
 
+        wasAttackPressed = attackPressed;
+        wasBlockPressed = blockPressed;
+
+        DrainBlockStamina();
+        RegenerateStamina();
         UpdateAnimations();
     }
 
@@ -106,14 +134,23 @@ public class PlayerMovement : MonoBehaviour
 
     private void Move()
     {
+        if (rb == null)
+        {
+            return;
+        }
+
         Vector3 movement = new Vector3(horizontalInput * speed, rb.linearVelocity.y, 0f);
         rb.linearVelocity = movement;
     }
 
     private void Jump()
     {
-        animator.SetTrigger("Jump");
-        rb.linearVelocity = new Vector3(rb.linearVelocity.x, jumpForce, rb.linearVelocity.z);
+        animator?.SetTrigger("Jump");
+
+        if (rb != null)
+        {
+            rb.linearVelocity = new Vector3(rb.linearVelocity.x, jumpForce, rb.linearVelocity.z);
+        }
     }
 
     private void TriggerAttack()
@@ -128,12 +165,22 @@ public class PlayerMovement : MonoBehaviour
             return;
         }
 
+        if (!TrySpendStamina(attackStaminaCost))
+        {
+            return;
+        }
+
         animator.SetTrigger("Attack");
         nextAttackTime = Time.time + attackCooldown;
     }
 
     private void StartBlock()
     {
+        if (stamina <= 0f)
+        {
+            return;
+        }
+
         SetBlocking(true);
     }
 
@@ -145,16 +192,32 @@ public class PlayerMovement : MonoBehaviour
     private void SetBlocking(bool value)
     {
         isBlocking = value;
+        animator?.SetBool("IsBlocking", isBlocking);
+    }
 
-        if (animator != null)
+    private void DrainBlockStamina()
+    {
+        if (!isBlocking)
         {
-            animator.SetBool("IsBlocking", isBlocking);
+            return;
+        }
+
+        float cost = blockStaminaDrainPerSecond * Time.deltaTime;
+        if (!TrySpendStamina(cost))
+        {
+            StopBlock();
         }
     }
 
-    public void SetOpponent(Transform opp)
+    private void RegenerateStamina()
     {
-        opponent = opp;
+        if (isBlocking || stamina >= maxStamina)
+        {
+            return;
+        }
+
+        float gain = staminaRegenPerSecond * Time.deltaTime;
+        stamina = Mathf.Min(maxStamina, stamina + gain);
     }
 
     public void TakeDamage(int amount, string attackerTag)
@@ -178,10 +241,6 @@ public class PlayerMovement : MonoBehaviour
         {
             Die();
         }
-        else
-        {
-            animator?.SetTrigger("Hit");
-        }
     }
 
     private void Die()
@@ -194,6 +253,11 @@ public class PlayerMovement : MonoBehaviour
         isDead = true;
 
         animator?.SetTrigger("Die");
+
+        if (weapon != null)
+        {
+            weapon.DisableHitBox();
+        }
 
         foreach (Collider c in GetComponentsInChildren<Collider>())
         {
@@ -211,11 +275,13 @@ public class PlayerMovement : MonoBehaviour
 
     private void UpdateAnimations()
     {
-        if (animator != null)
+        if (animator == null || rb == null)
         {
-            animator.SetFloat("Speed", Mathf.Abs(horizontalInput));
-            animator.SetFloat("VelocityY", rb.linearVelocity.y);
+            return;
         }
+
+        animator.SetFloat("VelocityX", -horizontalInput);
+        animator.SetFloat("VelocityY", rb.linearVelocity.y);
     }
 
     private void OnDrawGizmosSelected()
@@ -232,8 +298,45 @@ public class PlayerMovement : MonoBehaviour
         return health;
     }
 
+    public int getMaxHealth()
+    {
+        return maxHealth > 0 ? maxHealth : health;
+    }
+
     public int getStamina()
     {
-        return stamina;
+        return Mathf.RoundToInt(stamina);
+    }
+
+    private bool TrySpendStamina(float amount)
+    {
+        if (amount <= 0f)
+        {
+            return true;
+        }
+
+        if (stamina < amount)
+        {
+            return false;
+        }
+
+        stamina = Mathf.Max(0f, stamina - amount);
+        return true;
+    }
+
+    public void AE_EnableHitBox()
+    {
+        if (weapon != null)
+        {
+            weapon.EnableHitBox();
+        }
+    }
+
+    public void AE_DisableHitBox()
+    {
+        if (weapon != null)
+        {
+            weapon.DisableHitBox();
+        }
     }
 }

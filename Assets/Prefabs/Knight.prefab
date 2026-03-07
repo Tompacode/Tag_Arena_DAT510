@@ -234,8 +234,8 @@ GameObject:
   - component: {fileID: 1302292806166973605}
   - component: {fileID: 4308958530029361913}
   - component: {fileID: 2863494635681506244}
-  - component: {fileID: 6446902215350518549}
-  m_Layer: 0
+  - component: {fileID: 707648889130350699}
+  m_Layer: 6
   m_Name: SM_Wep_Halberd_01
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -324,10 +324,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damage: 35
   ownerTag: Player1
-  hitResetTime: 0.5
-  damageCollider: {fileID: 6446902215350518549}
---- !u!65 &6446902215350518549
-BoxCollider:
+  ownerObject: {fileID: 9041842857339640352}
+  inputPressThreshold: 0.5
+  damageCollider: {fileID: 707648889130350699}
+--- !u!64 &707648889130350699
+MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -339,14 +340,15 @@ BoxCollider:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 64
   m_LayerOverridePriority: 0
   m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.4, y: 1, z: 0.1}
-  m_Center: {x: -0.0000009220566, y: 1.19, z: -0.000000112819464}
+  serializedVersion: 5
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 4300000, guid: c503cdefec8b14b43a57bcacbe654ee9, type: 3}
 --- !u!1 &1843375125975317583
 GameObject:
   m_ObjectHideFlags: 0
@@ -1783,17 +1785,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PlayerID: 
-  health: 100
+  health: 200
   stamina: 100
-  speed: 5
+  maxStamina: 100
+  staminaRegenPerSecond: 15
+  speed: 3
   blockDamageMultiplier: 0.8
-  attackCooldown: 0.5
+  attackCooldown: 2
+  attackStaminaCost: 20
+  blockStaminaDrainPerSecond: 20
   jumpForce: 5
+  inputPressThreshold: 0.5
   groundCheck: {fileID: 819216931225025891}
   groundCheckRadius: 0.2
   groundLayer:
     serializedVersion: 2
     m_Bits: 8
+  weapon: {fileID: 2863494635681506244}
+  hitboxActiveSeconds: 0.3
 --- !u!95 &1488095395766763150
 Animator:
   serializedVersion: 7

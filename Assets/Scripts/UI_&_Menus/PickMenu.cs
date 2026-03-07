@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI; 
+using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 public class PickMenu : MonoBehaviour
 {
@@ -78,14 +79,7 @@ public class PickMenu : MonoBehaviour
 
     private void Update()
     {
-        if(pickStep == 3)
-        {
-           PlayButton.enabled = true;
-        }
-        else
-        {
-            PlayButton.enabled = false;
-        }
+        PlayButton.interactable = pickStep >= pickOrder.Length;
     }
 
     void UpdatePickerText()
@@ -133,6 +127,7 @@ public class PickMenu : MonoBehaviour
         }
 
         UpdatePickerText();
+        SelectNextAvailableButton();
     }
 
     public void GoToMainMenu()
@@ -174,26 +169,27 @@ public class PickMenu : MonoBehaviour
 
     public void HandlePick()
     {
-        // Varannan spelare väljer 
-        // if (currentPicker == Picker.Player1)
-        //    currentPicker = Picker.Player2;
-        // else
-        //    currentPicker = Picker.Player1;
-
-
-        // 1 2 2 1 
+        // Last pick completes draft
         if (pickStep >= pickOrder.Length - 1)
         {
+            pickStep = pickOrder.Length;
 
             if (menuPanelTextField != null)
+            {
                 menuPanelTextField.text = "Selection complete";
+            }
 
+            if (PlayButton != null)
+            {
+                PlayButton.interactable = true;
+            }
+
+            SelectNextAvailableButton();
             return;
         }
 
         pickStep++;
         currentPicker = pickOrder[pickStep];
-
         UpdatePickerText();
     }
 
@@ -229,13 +225,39 @@ public class PickMenu : MonoBehaviour
             clickedButton.interactable = false;
         }
 
-        if (pickStep < PickedCharacterPos.Length && PickedCharacterPos[pickStep] != null)
-        {
-            Transform pos = PickedCharacterPos[pickStep];
-        }
-
         enable3DModelWhenPicked(characterName);
         HandlePick();
+        SelectNextAvailableButton();
+    }
+
+    private void SelectNextAvailableButton()
+    {
+        if (EventSystem.current == null)
+        {
+            return;
+        }
+
+        // Draft complete -> force-select Play button
+        if (pickStep >= pickOrder.Length)
+        {
+            if (PlayButton != null)
+            {
+                EventSystem.current.SetSelectedGameObject(null);
+                EventSystem.current.SetSelectedGameObject(PlayButton.gameObject);
+            }
+
+            return;
+        }
+
+        foreach (var button in characterButtons)
+        {
+            if (button != null && button.interactable)
+            {
+                EventSystem.current.SetSelectedGameObject(null);
+                EventSystem.current.SetSelectedGameObject(button.gameObject);
+                return;
+            }
+        }
     }
 
     [SerializeField] Button KnightButton;

@@ -575,17 +575,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PlayerID: 
-  health: 100
+  health: 200
   stamina: 100
-  speed: 5
+  maxStamina: 100
+  staminaRegenPerSecond: 15
+  speed: 3
   blockDamageMultiplier: 0.8
-  attackCooldown: 0.5
+  attackCooldown: 2
+  attackStaminaCost: 20
+  blockStaminaDrainPerSecond: 20
   jumpForce: 5
+  inputPressThreshold: 0.5
   groundCheck: {fileID: 3523217352154840599}
   groundCheckRadius: 0.2
   groundLayer:
     serializedVersion: 2
     m_Bits: 8
+  weapon: {fileID: 8323866218146032928}
+  hitboxActiveSeconds: 0.3
 --- !u!95 &1951392870196042882
 Animator:
   serializedVersion: 7
@@ -890,8 +897,8 @@ GameObject:
   - component: {fileID: 8702298753024119887}
   - component: {fileID: 7230088693860532699}
   - component: {fileID: 8323866218146032928}
-  - component: {fileID: 8846386228396986126}
-  m_Layer: 0
+  - component: {fileID: 7365153232830520406}
+  m_Layer: 6
   m_Name: SM_Wep_Odachi_01
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -980,10 +987,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damage: 35
   ownerTag: Player1
-  hitResetTime: 0.5
-  damageCollider: {fileID: 8846386228396986126}
---- !u!65 &8846386228396986126
-BoxCollider:
+  ownerObject: {fileID: 2695654559273948122}
+  inputPressThreshold: 0.5
+  damageCollider: {fileID: 7365153232830520406}
+--- !u!64 &7365153232830520406
+MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -995,14 +1003,15 @@ BoxCollider:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 64
   m_LayerOverridePriority: 0
   m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.07746155, y: 1, z: 0.1903155}
-  m_Center: {x: -0.00000030414347, y: 0.8, z: -0.03257094}
+  serializedVersion: 5
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 4300000, guid: b8000949872c53948ba6fe5768471d8c, type: 3}
 --- !u!1 &3693935706513956471
 GameObject:
   m_ObjectHideFlags: 0

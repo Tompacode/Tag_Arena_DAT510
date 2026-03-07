@@ -20,7 +20,8 @@ public class GameManager : MonoBehaviour
     private int player1Remaining;
     private int player2Remaining;
 
-    
+    private string winner = "Player1";
+
 
     private void Awake()
     {
@@ -98,8 +99,13 @@ public class GameManager : MonoBehaviour
 
     public void EndGame(string loserTag)
     {
-        string winner = loserTag == "Player1" ? "Player2" : "Player1";
+        winner = loserTag == "Player1" ? "Player2" : "Player1";
         Debug.Log($"Game Over. {winner} wins. {loserTag} has no characters left.");
         Time.timeScale = 0f;
+    }
+
+    public string GetWinner()
+    {
+        return winner;
     }
 }

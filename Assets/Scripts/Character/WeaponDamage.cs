@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Collider))]
@@ -7,54 +6,115 @@ public class WeaponDamage : MonoBehaviour
     [SerializeField]
     private int damage = 10;
 
+    [Header("Owner/Input")]
     [SerializeField]
     private string ownerTag = "Player1";
-
     [SerializeField]
-    private float hitResetTime = 0.5f;
+    private GameObject ownerObject;
+    [SerializeField]
+    private float inputPressThreshold = 0.5f;
 
+    [Header("Collider")]
     [SerializeField]
     private Collider damageCollider;
 
+    private bool hasHitThisSwing = false;
+
     private void Awake()
     {
-        var owner = GetComponentInParent<PlayerMovement>();
-        if (owner != null)
+        if (damageCollider == null)
         {
-            ownerTag = owner.gameObject.tag;
+            damageCollider = GetComponent<Collider>();
         }
-        else
+
+        if (damageCollider != null)
         {
-            ownerTag = transform.root.tag;
+            damageCollider.isTrigger = true;
+            damageCollider.enabled = false;
         }
+
+        EnsureOwnerTag();
     }
 
-    private void Update()
+    private void Start()
     {
-        //if (Input.GetButtonDown(ownerTag + "_" + "Attack")){damageCollider.enabled = true;}
+        EnsureOwnerTag();
     }
+
     private void OnTriggerEnter(Collider other)
     {
-        if (string.IsNullOrEmpty(ownerTag))
+        if (damageCollider == null || !damageCollider.enabled || hasHitThisSwing)
         {
             return;
         }
 
-        var root = other.transform.root;
-        int targetId = root.GetInstanceID();
+        EnsureOwnerTag();
+        if (string.IsNullOrEmpty(ownerTag) || ownerTag == "Untagged")
+        {
+            return;
+        }   
 
-        // Ignore self/owner and prevent multiple hits on the same target per swing
-        if (root.CompareTag(ownerTag))
+        var target = other.GetComponentInParent<PlayerMovement>();
+        if (target == null)
         {
             return;
         }
 
-        
-
-        if (root.TryGetComponent(out PlayerMovement target))
+        if (target.CompareTag(ownerTag))
         {
-            target.TakeDamage(damage, ownerTag);
-            //damageCollider.enabled = false;
+            return;
+        }
+
+        hasHitThisSwing = true;
+        target.TakeDamage(damage, ownerTag);
+        Debug.Log($"{ownerTag} hit {target.name} for {damage} damage.");
+    }
+
+    public void EnableHitBox()
+    {
+        if (damageCollider == null)
+        {
+            return;
+        }
+
+        if (damageCollider.enabled)
+        {
+            return;
+        }
+
+        EnsureOwnerTag();
+        hasHitThisSwing = false;
+        damageCollider.enabled = true;
+    }
+
+    public void DisableHitBox()
+    {
+        if (damageCollider == null)
+        {
+            return;
+        }
+
+        damageCollider.enabled = false;
+    }
+
+    private void EnsureOwnerTag()
+    {
+        if (ownerObject == null)
+        {
+            var ownerMovement = GetComponentInParent<PlayerMovement>();
+            if (ownerMovement != null)
+            {
+                ownerObject = ownerMovement.gameObject;
+            }
+            else
+            {
+                ownerObject = transform.root.gameObject;
+            }
+        }
+
+        if (ownerObject != null && !string.IsNullOrEmpty(ownerObject.tag) && ownerObject.tag != "Untagged")
+        {
+            ownerTag = ownerObject.tag;
         }
     }
 }
