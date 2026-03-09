@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Audio;
+using UnityEngine.UI;
 using TMPro;
 
 public class AudioSlider : MonoBehaviour
@@ -13,29 +14,109 @@ public class AudioSlider : MonoBehaviour
     [SerializeField]
     private AudioMixMode MixMode;
 
-    public void OnChangeSlider(float Value)
+    [SerializeField]
+    private AudioManagerVolumeTarget managerTarget = AudioManagerVolumeTarget.None;
+
+    private Slider slider;
+
+    private void Awake()
     {
-        ValueText.SetText($"{Value.ToString("N1")}");
+        slider = GetComponent<Slider>();
+    }
+
+    private void OnEnable()
+    {
+        if (slider != null)
+        {
+            slider.onValueChanged.AddListener(OnChangeSlider);
+            OnChangeSlider(slider.value);
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (slider != null)
+        {
+            slider.onValueChanged.RemoveListener(OnChangeSlider);
+        }
+    }
+
+    public void OnChangeSlider(float rawValue)
+    {
+        if (ValueText != null)
+        {
+            ValueText.SetText($"{Mathf.RoundToInt(rawValue)}");
+        }
+
+        float value = Normalize(rawValue); // 0..1 for actual volume
+
+        if (managerTarget != AudioManagerVolumeTarget.None)
+        {
+            if (AudioManager.Instance == null)
+            {
+                Debug.LogWarning("AudioSlider: AudioManager.Instance is null.");
+                return;
+            }
+
+            if (managerTarget == AudioManagerVolumeTarget.Music)
+            {
+                AudioManager.Instance.SetMusicVolume(value);
+            }
+            else if (managerTarget == AudioManagerVolumeTarget.Sfx)
+            {
+                AudioManager.Instance.SetSfxVolume(value);
+            }
+
+            return;
+        }
 
         switch (MixMode)
         {
             case AudioMixMode.LinearAudioSourceVolume:
-                AudioSource.volume = Value;
+                if (AudioSource != null)
+                {
+                    AudioSource.volume = value;
+                }
                 break;
+
             case AudioMixMode.LinearMixerVolume:
-                Mixer.SetFloat("Volume", (-80 + Value * 100));
+                if (Mixer != null)
+                {
+                    Mixer.SetFloat("Volume", -80f + value * 100f);
+                }
                 break;
+
             case AudioMixMode.LogarithmicMixerVolume:
-                Mixer.SetFloat("Volume", Mathf.Log10(Value) * 20);
+                if (Mixer != null)
+                {
+                    float safeValue = Mathf.Max(0.0001f, value);
+                    Mixer.SetFloat("Volume", Mathf.Log10(safeValue) * 20f);
+                }
                 break;
         }
     }
 
+    private float Normalize(float rawValue)
+    {
+        if (slider == null || Mathf.Approximately(slider.maxValue, slider.minValue))
+        {
+            return Mathf.Clamp01(rawValue);
+        }
+
+        return Mathf.InverseLerp(slider.minValue, slider.maxValue, rawValue);
+    }
 
     public enum AudioMixMode
     {
         LinearAudioSourceVolume,
         LinearMixerVolume,
         LogarithmicMixerVolume
+    }
+
+    public enum AudioManagerVolumeTarget
+    {
+        None,
+        Music,
+        Sfx
     }
 }

@@ -600,11 +600,11 @@ MonoBehaviour:
   health: 100
   stamina: 100
   maxStamina: 100
-  staminaRegenPerSecond: 15
-  speed: 5
+  staminaRegenPerSecond: 10
+  speed: 6
   blockDamageMultiplier: 0.4
-  attackCooldown: 1
-  attackStaminaCost: 10
+  attackCooldown: 0.7
+  attackStaminaCost: 20
   blockStaminaDrainPerSecond: 20
   jumpForce: 5
   inputPressThreshold: 0.5
@@ -614,7 +614,8 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   weapon: {fileID: 188259928079785716}
-  hitboxActiveSeconds: 0.3
+  blockClip: {fileID: 8300000, guid: cf947673c3bf039408ff91000bb29438, type: 3}
+  blockVolume: 1
 --- !u!95 &6443171171555775438
 Animator:
   serializedVersion: 7
@@ -2159,8 +2160,9 @@ MonoBehaviour:
   damage: 20
   ownerTag: Player1
   ownerObject: {fileID: 2747697646010744936}
-  inputPressThreshold: 0.5
   damageCollider: {fileID: 3133897427194884495}
+  hitClip: {fileID: 8300000, guid: e4b09e3e0e77f054fb13d43f7686ba08, type: 3}
+  hitVolume: 0.4
 --- !u!65 &3133897427194884495
 BoxCollider:
   m_ObjectHideFlags: 0

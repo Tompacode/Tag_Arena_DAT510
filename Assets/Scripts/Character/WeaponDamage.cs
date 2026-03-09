@@ -11,12 +11,16 @@ public class WeaponDamage : MonoBehaviour
     private string ownerTag = "Player1";
     [SerializeField]
     private GameObject ownerObject;
-    [SerializeField]
-    private float inputPressThreshold = 0.5f;
 
     [Header("Collider")]
     [SerializeField]
     private Collider damageCollider;
+
+    [Header("Audio")]
+    [SerializeField]
+    private AudioClip hitClip;
+    [SerializeField]
+    private float hitVolume = 1f;
 
     private bool hasHitThisSwing = false;
 
@@ -65,9 +69,9 @@ public class WeaponDamage : MonoBehaviour
             return;
         }
 
+        PlayHitSfx(other.ClosestPoint(transform.position));
         hasHitThisSwing = true;
         target.TakeDamage(damage, ownerTag);
-        Debug.Log($"{ownerTag} hit {target.name} for {damage} damage.");
     }
 
     public void EnableHitBox()
@@ -116,5 +120,15 @@ public class WeaponDamage : MonoBehaviour
         {
             ownerTag = ownerObject.tag;
         }
+    }
+
+    private void PlayHitSfx(Vector3 hitPosition)
+    {
+        if (hitClip == null || AudioManager.Instance == null)
+        {
+            return;
+        }
+
+        AudioManager.Instance.PlaySfx(hitClip, hitVolume);
     }
 }

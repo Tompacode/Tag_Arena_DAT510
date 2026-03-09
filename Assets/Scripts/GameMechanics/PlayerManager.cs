@@ -68,9 +68,8 @@ public class PlayerManager : MonoBehaviour
 
     private void SwapPlayer1()
     {
-        if (gm.player1TeamList == null || gm.player1TeamList.Count < 2)
+        if (!CanSwap(activePlayer1, inactivePlayer1))
         {
-            Debug.LogWarning("SwapPlayer1 skipped: player1TeamList needs at least two characters.");
             return;
         }
 
@@ -83,9 +82,8 @@ public class PlayerManager : MonoBehaviour
 
     private void SwapPlayer2()
     {
-        if (gm.player2TeamList == null || gm.player2TeamList.Count < 2)
+        if (!CanSwap(activePlayer2, inactivePlayer2))
         {
-            Debug.LogWarning("SwapPlayer2 skipped: player2TeamList needs at least two characters.");
             return;
         }
 
@@ -94,6 +92,21 @@ public class PlayerManager : MonoBehaviour
 
         SwapTransforms(activePlayer2, inactivePlayer2);
         (activePlayer2, inactivePlayer2) = (inactivePlayer2, activePlayer2);
+    }
+
+    private static bool CanSwap(GameObject activePlayer, GameObject inactivePlayer)
+    {
+        if (activePlayer == null || inactivePlayer == null)
+        {
+            return false;
+        }
+
+        if (!activePlayer.activeInHierarchy || !inactivePlayer.activeInHierarchy)
+        {
+            return false;
+        }
+
+        return true;
     }
 
     private static void SwapTransforms(GameObject first, GameObject second) 
@@ -147,7 +160,7 @@ public class PlayerManager : MonoBehaviour
             }
         }
         else if (tag == "Player2")
-        {   
+        {
             if (activePlayer2 == deadPlayer.gameObject)
             {
                 if (inactivePlayer2 != null)

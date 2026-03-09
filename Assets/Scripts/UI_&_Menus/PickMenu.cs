@@ -59,7 +59,7 @@ public class PickMenu : MonoBehaviour
         //gm = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>();
     }
 
-    void Start()
+    private void Start()
     {
         PickedCharacterPos = new Transform[]
         {
@@ -71,6 +71,15 @@ public class PickMenu : MonoBehaviour
 
         ResetSelection();
         UpdatePickerText();
+        UpdatePlayButtonState();
+    }
+
+    private void UpdatePlayButtonState()
+    {
+        if (PlayButton != null)
+        {
+            PlayButton.interactable = pickStep >= pickOrder.Length;
+        }
     }
 
     // Update is called once per frame

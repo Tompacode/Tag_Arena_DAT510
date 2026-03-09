@@ -16,9 +16,6 @@ AnimatorStateMachine:
     m_State: {fileID: 6372103537706705030}
     m_Position: {x: 320, y: 40, z: 0}
   - serializedVersion: 1
-    m_State: {fileID: -8989219237587042460}
-    m_Position: {x: 190, y: -210, z: 0}
-  - serializedVersion: 1
     m_State: {fileID: -2804921580575922008}
     m_Position: {x: -30, y: 230, z: 0}
   - serializedVersion: 1
@@ -36,32 +33,6 @@ AnimatorStateMachine:
   m_ExitPosition: {x: 470, y: -90, z: 0}
   m_ParentStateMachinePosition: {x: 800, y: 20, z: 0}
   m_DefaultState: {fileID: -2804921580575922008}
---- !u!1102 &-8989219237587042460
-AnimatorState:
-  serializedVersion: 6
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: Death
-  m_Speed: 1
-  m_CycleOffset: 0
-  m_Transitions: []
-  m_StateMachineBehaviours: []
-  m_Position: {x: 50, y: 50, z: 0}
-  m_IKOnFeet: 0
-  m_WriteDefaultValues: 1
-  m_Mirror: 0
-  m_SpeedParameterActive: 0
-  m_MirrorParameterActive: 0
-  m_CycleOffsetParameterActive: 0
-  m_TimeParameterActive: 0
-  m_Motion: {fileID: -203655887218126122, guid: dab323405acfe8341958091ce62d1496, type: 3}
-  m_Tag: 
-  m_SpeedParameter: 
-  m_MirrorParameter: 
-  m_CycleOffsetParameter: 
-  m_TimeParameter: 
 --- !u!1102 &-7569694148496551076
 AnimatorState:
   serializedVersion: 6
@@ -333,7 +304,7 @@ BlendTree:
   m_Childs:
   - serializedVersion: 2
     m_Motion: {fileID: -203655887218126122, guid: a1412f12743a3ca4198bd5900cfd1465, type: 3}
-    m_Threshold: -0.2
+    m_Threshold: -0.1
     m_Position: {x: 0, y: 0}
     m_TimeScale: -1
     m_CycleOffset: 0
@@ -349,7 +320,7 @@ BlendTree:
     m_Mirror: 0
   - serializedVersion: 2
     m_Motion: {fileID: -203655887218126122, guid: a1412f12743a3ca4198bd5900cfd1465, type: 3}
-    m_Threshold: 0.2
+    m_Threshold: 0.1
     m_Position: {x: 0, y: 0}
     m_TimeScale: 1
     m_CycleOffset: 0
@@ -357,8 +328,8 @@ BlendTree:
     m_Mirror: 0
   m_BlendParameter: VelocityX
   m_BlendParameterY: Speed
-  m_MinThreshold: -0.2
-  m_MaxThreshold: 0.2
+  m_MinThreshold: -0.1
+  m_MaxThreshold: 0.1
   m_UseAutomaticThresholds: 0
   m_NormalizedBlendValues: 0
   m_BlendType: 0

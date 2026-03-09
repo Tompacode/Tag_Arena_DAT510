@@ -26,7 +26,10 @@ public class PlayerMovement : MonoBehaviour
 
     [Header("Combat")]
     [SerializeField] private WeaponDamage weapon;
-    [SerializeField] private float hitboxActiveSeconds = 0.3f;
+
+    [Header("Audio")]
+    [SerializeField] private AudioClip blockClip;
+    [SerializeField] [Range(0f, 1f)] private float blockVolume = 1f;
 
     private int maxHealth;
 
@@ -83,10 +86,6 @@ public class PlayerMovement : MonoBehaviour
         }
 
         horizontalInput = Input.GetAxisRaw(PlayerID + "_" + "Horizontal");
-        if (PlayerID == "Player1" && Input.GetAxisRaw(PlayerID + "_" + "Horizontal") > 0.3)
-        {
-            Debug.Log($"{PlayerID} horizontal input: {horizontalInput}");
-        }
         isGrounded = groundCheck != null && Physics.CheckSphere(groundCheck.position, groundCheckRadius, groundLayer);
 
         if (Input.GetButtonDown(PlayerID + "_" + "Jump") && isGrounded)
@@ -235,12 +234,28 @@ public class PlayerMovement : MonoBehaviour
         float modifier = isBlocking ? blockDamageMultiplier : 1f;
         int finalDamage = Mathf.Max(1, Mathf.CeilToInt(amount * modifier));
 
+        bool blockedSuccessfully = isBlocking && finalDamage < amount;
+        if (blockedSuccessfully)
+        {
+            PlayBlockSfx();
+        }
+
         health = Mathf.Max(health - finalDamage, 0);
 
         if (health <= 0)
         {
             Die();
         }
+    }
+
+    private void PlayBlockSfx()
+    {
+        if (blockClip == null || AudioManager.Instance == null)
+        {
+            return;
+        }
+
+        AudioManager.Instance.PlaySfxAtPoint(blockClip, transform.position, blockVolume);
     }
 
     private void Die()
@@ -252,23 +267,19 @@ public class PlayerMovement : MonoBehaviour
 
         isDead = true;
 
-        animator?.SetTrigger("Die");
-
         if (weapon != null)
         {
             weapon.DisableHitBox();
-        }
-
-        foreach (Collider c in GetComponentsInChildren<Collider>())
-        {
-            c.enabled = false;
         }
 
         if (rb != null)
         {
             rb.linearVelocity = Vector3.zero;
             rb.isKinematic = true;
+            rb.detectCollisions = false;
         }
+
+        enabled = false;
 
         PlayerManager.Instance?.OnPlayerDeath(this);
     }

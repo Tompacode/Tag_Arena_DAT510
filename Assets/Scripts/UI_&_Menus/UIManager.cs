@@ -1,11 +1,13 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
 {
     [SerializeField] private PlayerManager playerManager;
+    [SerializeField] private TextMeshProUGUI roundScoreText;
 
     [System.Serializable]
     public class Character
@@ -28,15 +30,22 @@ public class UIManager : MonoBehaviour
     public Slider player1BenchHealth;
     public Slider player2BenchHealth;
 
-    public Slider player1ActiveStamina; 
+    public Slider player1ActiveStamina;
     public Slider player2ActiveStamina;
 
     public Slider player1BenchStamina;
     public Slider player2BenchStamina;
 
-    [Header("Game Over UI")]
+    [Header("Overlays")]
     public GameObject gameOverUI;
     public TextMeshProUGUI gameOverText;
+    public GameObject settingsOverlay;
+
+    [Header("Default Selected Buttons")]
+    [SerializeField] private Button pauseButton;
+    [SerializeField] private Button playNextRoundButton;
+
+    private bool isPaused;
 
     private void Awake()
     {
@@ -44,12 +53,29 @@ public class UIManager : MonoBehaviour
         {
             playerManager = Object.FindFirstObjectByType<PlayerManager>();
         }
-        gameOverUI.SetActive(false);
+
+        if (gameOverUI != null)
+        {
+            gameOverUI.SetActive(false);
+        }
+
+        if (settingsOverlay != null)
+        {
+            settingsOverlay.SetActive(false);
+        }
+
+        isPaused = false;
     }
 
     private void Update()
     {
+        if (Input.GetButtonDown("Pause"))
+        {
+            TogglePause();
+        }
+
         UpdateUI();
+        UpdateRoundScoreUI();
     }
 
     private void UpdateUI()
@@ -130,6 +156,58 @@ public class UIManager : MonoBehaviour
         }
     }
 
+    private void UpdateRoundScoreUI()
+    {
+        if (roundScoreText == null || GameManager.Instance == null)
+        {
+            return;
+        }
+
+        roundScoreText.text = GameManager.Instance.GetRoundScoreText();
+    }
+
+    public void TogglePause()
+    {
+        if (gameOverUI != null && gameOverUI.activeSelf)
+        {
+            return;
+        }
+
+        if (isPaused)
+        {
+            Resume();
+        }
+        else
+        {
+            PauseGame();
+        }
+    }
+
+    public void PauseGame()
+    {
+        isPaused = true;
+
+        if (settingsOverlay != null)
+        {
+            settingsOverlay.SetActive(true);
+        }
+
+        SelectButton(pauseButton);
+        Time.timeScale = 0f;
+    }
+
+    public void Resume()
+    {
+        isPaused = false;
+
+        if (settingsOverlay != null)
+        {
+            settingsOverlay.SetActive(false);
+        }
+
+        Time.timeScale = 1f;
+    }
+
     public void ShowGameOver(string winner)
     {
         if (gameOverText != null)
@@ -141,6 +219,26 @@ public class UIManager : MonoBehaviour
         {
             gameOverUI.SetActive(true);
         }
+
+        if (settingsOverlay != null)
+        {
+            settingsOverlay.SetActive(false);
+        }
+
+        isPaused = false;
+        UpdateRoundScoreUI();
+        SelectButton(playNextRoundButton);
+    }
+
+    private void SelectButton(Button button)
+    {
+        if (button == null || EventSystem.current == null)
+        {
+            return;
+        }
+
+        EventSystem.current.SetSelectedGameObject(null);
+        EventSystem.current.SetSelectedGameObject(button.gameObject);
     }
 
     private Sprite GetHeadshot(GameObject obj)
@@ -163,15 +261,26 @@ public class UIManager : MonoBehaviour
         return null;
     }
 
-    public void Restart()
+    public void NextRound()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         Time.timeScale = 1f;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
     public void MainMenu()
     {
-        SceneManager.LoadScene("MainMenu");
         Time.timeScale = 1f;
+        SceneManager.LoadScene("MainMenu");
+    }
+
+    public void ResetScores()
+    {
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.ResetRoundScore();
+        }
+
+        Time.timeScale = 1f;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }

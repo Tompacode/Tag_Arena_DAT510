@@ -325,8 +325,9 @@ MonoBehaviour:
   damage: 35
   ownerTag: Player1
   ownerObject: {fileID: 9041842857339640352}
-  inputPressThreshold: 0.5
   damageCollider: {fileID: 707648889130350699}
+  hitClip: {fileID: 8300000, guid: e4b09e3e0e77f054fb13d43f7686ba08, type: 3}
+  hitVolume: 0.4
 --- !u!64 &707648889130350699
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -1788,11 +1789,11 @@ MonoBehaviour:
   health: 200
   stamina: 100
   maxStamina: 100
-  staminaRegenPerSecond: 15
-  speed: 3
+  staminaRegenPerSecond: 10
+  speed: 2
   blockDamageMultiplier: 0.8
-  attackCooldown: 2
-  attackStaminaCost: 20
+  attackCooldown: 1.3
+  attackStaminaCost: 40
   blockStaminaDrainPerSecond: 20
   jumpForce: 5
   inputPressThreshold: 0.5
@@ -1802,7 +1803,8 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   weapon: {fileID: 2863494635681506244}
-  hitboxActiveSeconds: 0.3
+  blockClip: {fileID: 8300000, guid: cf947673c3bf039408ff91000bb29438, type: 3}
+  blockVolume: 1
 --- !u!95 &1488095395766763150
 Animator:
   serializedVersion: 7
